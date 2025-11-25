@@ -1,21 +1,29 @@
 package com.javaproject.java_project.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Getter
 @Setter
+@AllArgsConstructor
+@Builder
+@Data
+
+@Component
 public class User
 {
     private int id;
     private String username;
     private String passwordHash;
-    private int level;
-    private int xp;
-    private int streak;
-    List<Integer> userCourses;
+    @Builder.Default
+    private int level = 1;
+    @Builder.Default
+    private int xp=0;
+    @Builder.Default
+    private int streak=0;
+    @Builder.Default
+    List<Integer> userCourses = new ArrayList<>();
 }
