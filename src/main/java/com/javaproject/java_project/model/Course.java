@@ -1,15 +1,16 @@
 package com.javaproject.java_project.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @Data
+@Builder
+@AllArgsConstructor
 
 @Component
 public class Course
@@ -17,5 +18,6 @@ public class Course
     private int courseId;
     private String courseName;
     private int userId; // owner
-    private List<Integer> tasks; // stored by IDs
+    @Builder.Default
+    private List<Integer> tasks = new ArrayList<>(); // stored by IDs
 }
