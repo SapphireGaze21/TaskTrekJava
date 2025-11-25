@@ -6,11 +6,20 @@ import java.util.ArrayList;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthService {
-
+public class AuthService
+{
     // In memory Database for now, Mongo later
     private List<User> users = new ArrayList<>();
     private int nextID = 1; // autoincrement this for registering users
+
+    // currently logged-in user (set on successful login)
+    private User currentUser;
+
+    // helper so other services can know who is logged in
+    public User getCurrentUser()
+    {
+        return currentUser;
+    }
 
     public User registerUser(String username, String password)
     {
@@ -28,5 +37,4 @@ public class AuthService {
         // Match => return user
         // Else => null
     }
-
 }
