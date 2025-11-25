@@ -5,9 +5,8 @@ import java.util.List;
 
 @Data
 public class Course{
-    private int CourseID;
-    private String title;
-    private String description;
-    private int numberOfTasks;
-    private List<Integer> TaskIDs;
+    private int courseID;
+    private String courseName;
+    private int userID // owner
+    private List<Integer> tasks; // stored by IDs
 }
