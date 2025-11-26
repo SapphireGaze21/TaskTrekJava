@@ -1,6 +1,8 @@
 package com.javaproject.java_project.model;
 
 import lombok.Data;
+import java.time.LocalDateTime;
+
 
 @Data
 
@@ -13,4 +15,5 @@ public class Task {
     private int courseID;
     private int ownerUserID;
     private boolean completed;
+    private LocalDateTime deadline;
 }
