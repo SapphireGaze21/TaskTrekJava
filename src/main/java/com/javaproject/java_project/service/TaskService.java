@@ -45,8 +45,6 @@ public class TaskService {
         task.setCourseID(courseID);
         task.setTitle(title);
         task.setDescription(description);
-        //setbasexp
-        //setmultiplier
         task.setCompleted(false);
         task.setDeadline(deadline);
         task.setDifficulty(difficulty);
@@ -74,14 +72,60 @@ public class TaskService {
         // check if taskID matches any of the tasks list IDs
         // if not, return null (task not found)
         // else, return the task
+        for (Task task : tasks){
+            if(task.getCourseID() == courseID && task.getTaskID() == taskID) {
+                return task;
+            }
+        }
+        return null;
     }
 
-    public Task editTask(int courseID, int taskID, String newTitle, String newDesc, LocalDateTime newDeadline)
+    public Task editTask(int courseID, int taskID, String newTitle, String newDesc, LocalDateTime newDeadline, String newDifficulty)
     {
         // check if taskID matches any of the task list IDs
         // if not, return NULL (task not found)
         // Else, edit the task
         // return the task
+        User currentUser = authService.getCurrentUser();
+        if(currentUser == null){
+            return null;
+        }
+
+        Task task = getTaskByID(courseID, taskID);
+        if(task == null){
+            return null;
+        }
+
+        if(currentUser.getId() != task.getOwnerUserID()){
+            return null;
+        }
+
+        task.setTitle(newTitle);
+        task.setDescription(newDesc);
+        task.setDeadline(newDeadline);
+        task.setDifficulty(newDifficulty);
+
+        if(newDifficulty != null){
+            task.setDifficulty(newDifficulty);
+
+            if(newDifficulty.equalsIgnoreCase("HARD")){
+                task.setBaseXP(100);
+                task.setMultiplier(2.0);
+            }
+            else if(newDifficulty.equalsIgnoreCase("MEDIUM")){
+                task.setBaseXP(80);
+                task.setMultiplier(1.5);
+            }
+            else{
+                task.setBaseXP(50);
+                task.setMultiplier(1.0);
+            }
+        }
+
+        return task;
+
+
+
     }
 
     public boolean deleteTask(int courseID, int taskID)
