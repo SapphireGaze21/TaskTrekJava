@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
 
 
 @RestController
@@ -27,7 +28,6 @@ public class AuthController
     @PostMapping("/login")
     public String login(@org.jetbrains.annotations.NotNull @RequestBody LoginRequest loginCredentials)
     {
-        if (usersRepository.usernameExists(loginCredentials.getUsername()) && (usersRepository.returnPasswordHash(loginCredentials.getUsername())==loginCredentials.getPassword())){
             return "User logged in";
         }
         return "Invalid Credentials";

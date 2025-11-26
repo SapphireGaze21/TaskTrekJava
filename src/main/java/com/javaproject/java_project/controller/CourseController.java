@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/courses")
 public class CourseController {
 
+
+
     @GetMapping
     public String dashBoard()
     {
+
         return "Dashboard shown";
     }
 
