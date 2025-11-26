@@ -16,7 +16,6 @@ public class CourseService {
     private int nextID = 1; // autoincrement this for next courses
 
     // we use AuthService to know which user is currently logged in
-    @Autowired
     private final AuthService authService;
 
     public CourseService(AuthService authService) {
@@ -31,19 +30,43 @@ public class CourseService {
 
         int currentUserID = authService.getCurrentUser().getId();
 
+        for(Course course:courses) {
+            if (courseName.equals(course.getCourseName())) {
+                return null;
+            }
+        }
+        Course newcourse = Course.builder().courseId(nextID).courseName(courseName).userId(currentUserID).build();
+        courses.add(newcourse);
+        authService.getCurrentUser().getUserCourses().add(nextID);
+        nextID += 1;
+        return newcourse;
         // check if name already exists in the courses, if so, return NULL (course name taken)
         // if fine, create the course object using the model, PASS THE USER ID TOO!
         // push to array and return the course
     }
 
-    public Course getCourseByID(int userID, int courseID)
-    {
+    public Course getCourseByID(int userID, int courseID) {
         // no logged-in user
         if (authService.getCurrentUser() == null)
             return null;
 
         int currentUserID = authService.getCurrentUser().getId();
 
+        boolean there = false;
+
+        for(int course:authService.getCurrentUser().getUserCourses()) {
+            if(course == courseID) {
+                there = true;
+            }
+        }
+        if(there) {
+            for (Course course : courses) {
+                if (course.getCourseId() == courseID) {
+                    return course;
+                }
+            }
+        }
+        return null;
         // check if courseID matches any of the course list IDs (userIDs should match too)
         // if not, return null (course not found)
         // else, return the course
@@ -57,6 +80,13 @@ public class CourseService {
 
         int currentUserID = authService.getCurrentUser().getId();
 
+        for(int course:authService.getCurrentUser().getUserCourses()) {
+            if (course == courseID) {
+                getCourseByID(userID,courseID).setCourseName(newCourseName);
+                return getCourseByID(userID,courseID);
+            }
+        }
+        return null;
         // check if courseID matches any of the course list IDs (userIDs should match too)
         // if not, return NULL (course not found)
         // Else, rename the course
@@ -72,6 +102,14 @@ public class CourseService {
         int currentUserID = authService.getCurrentUser().getId();
 
         // check if courseID matches any of the course list IDs (userIDs should match too)
+        for(int course:authService.getCurrentUser().getUserCourses()) {
+            if (course == courseID) {
+                courses.remove(getCourseByID(userID,courseID));
+                authService.getCurrentUser().getUserCourses().remove(Integer.valueOf(courseID));
+                return true;
+            }
+        }
+        return false;
         // if not, return NULL (course not found)
         // Else, delete from the courses array
         // True if deleted
