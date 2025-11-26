@@ -40,22 +40,33 @@ public class AuthService
     private User currentUser;
 
 
-    public User registerUser(String username, String password) {
+    public String registerUser(String username, String password) {
 
-        boolean usernameAlreadyExists = usersRepository.usernameExists(username);
-        if(usernameAlreadyExists){
-            throw new UsernameAlreadyTakenException("Username '" + username + "' is already taken.");            }
+        try {
+            boolean usernameAlreadyExists = usersRepository.usernameExists(username);
 
-        User newuser = User.builder()
-                .id(nextID)
-                .username(username)
-                .passwordHash(password)
-                .build();
-        nextID++;
+            if (usernameAlreadyExists) {
+                throw new UsernameAlreadyTakenException("Username '" + username + "' is already taken.");
+            }
 
-        User insertedUser = usersRepository.insert(newuser);
-        //users.add(newuser);
-        return newuser;
+            User newuser = User.builder()
+                    .id(nextID)
+                    .username(username)
+                    .passwordHash(password)
+                    .build();
+            nextID++;
+
+            User insertedUser = usersRepository.insert(newuser);
+            //users.add(newuser);
+            return "User registered successfully!";
+        }
+        catch (UsernameAlreadyTakenException E){
+            System.out.println(E.getMessage()); //for testing
+            return E.getMessage();
+        }
+        catch(Exception E){
+            return "Username not found!";
+        }
     }
         // check if username already exists, if so, return null (username taken)
         // if fine, create new user with the ID, username, passwordHash (just store the normal pwd for now)
@@ -63,22 +74,26 @@ public class AuthService
         // User object should match the model, add to arraylist
         // return the user object
 
-    public User loginUser(String username, String password) {
+    public String loginUser(String username, String password) {
         try {
             User user = usersRepository.findByUsername(username);
             if (user.getUsername().equals(username)) {
                 if (user.getPasswordHash().equals(password)) {
                     currentUser = user; // Set logged-in user
-                    return user;
+                    return "User logged in successfully";
                 } else {
                     throw new InvalidCredentialsException("Incorrect password for user '" + username + "'.");
                 }
             }
+            else{
+                throw new InvalidCredentialsException("Username '" + username + "' not found.");
+            }
         }
-        catch(Exception E) {
-            throw new InvalidCredentialsException("Username '" + username + "' not found.");
+        catch(InvalidCredentialsException E) {
+            System.out.println(E.getMessage());
+            return E.getMessage();
         }
-        return null;
+
     }
 
         // check if user exists in the list, if not just null

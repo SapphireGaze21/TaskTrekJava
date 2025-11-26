@@ -2,6 +2,7 @@ package com.javaproject.java_project.controller;
 
 import com.javaproject.java_project.model.LoginRequest;
 import com.javaproject.java_project.model.SignupRequest;
+import com.javaproject.java_project.model.User;
 import com.javaproject.java_project.repositories.UsersRepository;
 import com.javaproject.java_project.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,20 @@ public class AuthController
     @Autowired
     AuthService authService;
 
+    @Autowired
+    User user;
+
     @PostMapping("/register")
     public String register(@org.jetbrains.annotations.NotNull @RequestBody SignupRequest signupDetails)
     {
-        authService.registerUser(signupDetails.getUsername(), signupDetails.getPassword());
-        return "User registered";
+        //user = authService.registerUser(signupDetails.getUsername(), signupDetails.getPassword());
+        return authService.registerUser(signupDetails.getUsername(), signupDetails.getPassword());
     }
 
     @PostMapping("/login")
     public String login(@org.jetbrains.annotations.NotNull @RequestBody LoginRequest loginCredentials)
     {
-        authService.loginUser(loginCredentials.getUsername(), loginCredentials.getPassword());
-        return "logged in";
+        //user = authService.loginUser(loginCredentials.getUsername(), loginCredentials.getPassword());
+        return authService.loginUser(loginCredentials.getUsername(), loginCredentials.getPassword());
     }
 }
