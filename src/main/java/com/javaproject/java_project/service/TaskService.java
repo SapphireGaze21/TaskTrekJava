@@ -105,10 +105,9 @@ public class TaskService {
             return null;
         }
 
-        task.setTitle(newTitle);
-        task.setDescription(newDesc);
-        task.setDeadline(newDeadline);
-        task.setDifficulty(newDifficulty);
+        if(newTitle != null) task.setTitle(newTitle);
+        if(newDesc != null) task.setDescription(newDesc);
+        if(newDeadline != null) task.setDeadline(newDeadline);
 
         if(newDifficulty != null){
             task.setDifficulty(newDifficulty);
@@ -141,6 +140,11 @@ public class TaskService {
             return false;
         }
 
+        if(courseService.getCourseByID(currentUser.getId(), courseID) == null){
+            return false;
+        }
+
+
         Task task = getTaskByID(courseID, taskID);
         if(task == null){
             return false;
@@ -164,6 +168,11 @@ public class TaskService {
         if(currentUser == null){
             return false;
         }
+
+        if(courseService.getCourseByID(currentUser.getId(), courseID) == null){
+            return false;
+        }
+
 
         Task task = getTaskByID(courseID, taskID);
         if(task == null){
