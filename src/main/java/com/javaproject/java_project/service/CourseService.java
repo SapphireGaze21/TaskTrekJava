@@ -35,7 +35,6 @@ public class CourseService {
                 return null;
             }
         }
-        
         Course newcourse = Course.builder().courseId(nextID).courseName(courseName).userId(currentUserID).build();
         courses.add(newcourse);
         authService.getCurrentUser().getUserCourses().add(nextID);

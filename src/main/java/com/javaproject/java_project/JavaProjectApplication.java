@@ -7,12 +7,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class JavaProjectApplication {
     @Autowired
-    TaskRepository taskrepo1;
+    //TaskRepository taskrepo1;
 
 	public static void main(String[] args) {
 
         SpringApplication.run(JavaProjectApplication.class, args);
-        taskrepo1;
+        //taskrepo1;
 
 
 	}
