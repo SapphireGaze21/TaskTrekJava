@@ -39,6 +39,7 @@ public class AuthService
                 throw new UsernameAlreadyTakenException("Username '" + username + "' is already taken.");            }
         }
         User newuser = User.builder()
+                .id(nextID)
                 .username(username)
                 .passwordHash(password)
                 .build();
