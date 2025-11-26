@@ -1,8 +1,8 @@
 package com.javaproject.java_project.controller;
 
-import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
 import com.javaproject.java_project.repositories.UsersRepository;
+import com.javaproject.java_project.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,22 +11,13 @@ import org.springframework.web.bind.annotation.*;
 public class CourseController {
 
     @Autowired
-    UsersRepository usersRepository;
-
-    @Autowired
-    User currentUser;
+    CourseService courseService;
 
     @GetMapping
     public String dashBoard()
     {
-        String courses = "";
-        for (Course course : usersRepository.findCourses(currentUser.getId())) {
-            courses+= course.getCourseName();
-            courses+="\n";
-        }
 
-        
-        return courses;
+        return "Dashboard shown";
     }
 
     @GetMapping("/{courseId}")
