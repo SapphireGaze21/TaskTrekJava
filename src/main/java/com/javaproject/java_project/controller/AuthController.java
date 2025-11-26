@@ -26,6 +26,13 @@ public class AuthController
     @PostMapping("/register")
     public ResponseEntity<?> register(@org.jetbrains.annotations.NotNull @RequestBody SignupRequest signupDetails)
     {
+        // trim will take care of strings with just spaces (they are empty)
+        if (signupDetails.getUsername() == null || signupDetails.getUsername().trim().isEmpty())
+            return new ResponseEntity<>("Username cannot be empty", HttpStatus.BAD_REQUEST);
+
+        if (signupDetails.getPassword() == null || signupDetails.getPassword().trim().isEmpty())
+            return new ResponseEntity<>("Password cannot be empty", HttpStatus.BAD_REQUEST);
+        
         User created = authService.registerUser(signupDetails.getUsername(), signupDetails.getPassword());
 
         if (created == null)
