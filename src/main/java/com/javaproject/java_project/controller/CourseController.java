@@ -25,7 +25,7 @@ public class CourseController {
             courses+="\n";
         }
 
-        return "Dashboard shown";
+        
         return courses;
     }
 
