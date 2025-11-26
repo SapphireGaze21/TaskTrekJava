@@ -28,9 +28,7 @@ public class AuthController
     @PostMapping("/login")
     public String login(@org.jetbrains.annotations.NotNull @RequestBody LoginRequest loginCredentials)
     {
-        if (usersRepository.usernameExists(loginCredentials.getUsername()) && usersRepository.returnPasswordHash(loginCredentials.getUsername()).equals(loginCredentials.getPassword()) )
-            return "User logged in";
-
+       
         return "Invalid Credentials";
     }
 }
