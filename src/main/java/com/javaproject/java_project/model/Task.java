@@ -7,7 +7,10 @@ import lombok.Data;
 public class Task {
     private int taskID;
     private String title;
-    private String Description;
+    private String description;
     private int baseXP;
     private double multiplier;
+    private int courseID;
+    private int ownerUserID;
+    private boolean completed;
 }
