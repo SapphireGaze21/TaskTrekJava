@@ -2,6 +2,7 @@ package com.javaproject.java_project.controller;
 
 import com.javaproject.java_project.model.LoginRequest;
 import com.javaproject.java_project.repositories.UsersRepository;
+import com.javaproject.java_project.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,7 @@ import java.util.Objects;
 public class AuthController 
 {
     @Autowired
-    UsersRepository usersRepository;
+    AuthService authService;
 
     @PostMapping("/register")
     public String register()
@@ -28,7 +29,7 @@ public class AuthController
     @PostMapping("/login")
     public String login(@org.jetbrains.annotations.NotNull @RequestBody LoginRequest loginCredentials)
     {
-       
+
         return "Invalid Credentials";
     }
 }
