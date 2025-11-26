@@ -1,5 +1,6 @@
 package com.javaproject.java_project.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -24,6 +25,8 @@ public class User{
 
     @Indexed(unique = true)
     private String username;
+
+    @JsonIgnore
     private String passwordHash;
 
     @Builder.Default
