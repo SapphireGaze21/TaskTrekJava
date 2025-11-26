@@ -1,18 +1,32 @@
 package com.javaproject.java_project.controller;
 
+import com.javaproject.java_project.model.Course;
+import com.javaproject.java_project.model.User;
+import com.javaproject.java_project.repositories.UsersRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
 
+    @Autowired
+    UsersRepository usersRepository;
 
+    @Autowired
+    User currentUser;
 
     @GetMapping
     public String dashBoard()
     {
+        String courses = "";
+        for (Course course : usersRepository.findCourses(currentUser.getId())) {
+            courses+= course.getCourseName();
+            courses+="\n";
+        }
 
         return "Dashboard shown";
+        return courses;
     }
 
     @GetMapping("/{courseId}")
