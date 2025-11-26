@@ -28,6 +28,30 @@ public class TaskService {
     {
         // create the task object using the model, PASS THE COURSE ID TOO!
         // push to array and return the task
+
+        User currentUser = authService.getCurrentUser();
+
+        if(currentUser == null){
+            return null;
+        }
+
+        if(courseService.getCourseByID(currentUser.getId(), courseID) == null){
+            return null;
+        }
+
+        Task task = new Task();
+        task.setTaskID(nextID++);
+        task.setOwnerUserID(currentUser.getId());
+        task.setCourseID(courseID);
+        task.setTitle(title);
+        task.setDescription(description);
+        //setbasexp
+        //setmultiplier
+        task.setCompleted(false);
+        task.setDeadline(deadline);
+
+        tasks.add(task);
+        return task;
     }
 
     public Task getTaskByID(int courseID, int taskID)
