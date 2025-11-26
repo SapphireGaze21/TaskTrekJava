@@ -24,7 +24,7 @@ public class TaskService {
         this.courseService = courseService;
     }
 
-    public Task createTask(int courseID, String title, String description, LocalDateTime deadline)
+    public Task createTask(int courseID, String title, String description, LocalDateTime deadline, String difficulty)
     {
         // create the task object using the model, PASS THE COURSE ID TOO!
         // push to array and return the task
@@ -49,6 +49,21 @@ public class TaskService {
         //setmultiplier
         task.setCompleted(false);
         task.setDeadline(deadline);
+        task.setDifficulty(difficulty);
+
+        if(difficulty.equalsIgnoreCase("HARD")){
+            task.setBaseXP(100);
+            task.setMultiplier(2.0);
+        }
+        else if(difficulty.equalsIgnoreCase("MEDIUM")){
+            task.setBaseXP(80);
+            task.setMultiplier(1.5);
+        }
+        else{
+            task.setBaseXP(50);
+            task.setMultiplier(1.0);
+        }
+
 
         tasks.add(task);
         return task;
