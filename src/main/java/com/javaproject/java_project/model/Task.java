@@ -16,4 +16,5 @@ public class Task {
     private int ownerUserID;
     private boolean completed;
     private LocalDateTime deadline;
+    private String difficulty;
 }
