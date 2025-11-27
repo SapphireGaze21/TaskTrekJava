@@ -2,25 +2,35 @@ package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
+import com.javaproject.java_project.repositories.UsersRepository;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.ArrayList;
 
 @Service
 public class CourseService {
 
-    // In-memory database of courses for now (mongo later)
-    List<Course> courses = new ArrayList<>();
+    @Autowired
+    UsersRepository usersRepository;
+
     private int nextID = 1; // autoincrement this for next courses
 
     // we use AuthService to know which user is currently logged in
-    private final AuthService authService;
 
+    private final AuthService authService ;
+    int userID;
+
+    @Getter
+    List<Course> courses ;
     public CourseService(AuthService authService) {
         this.authService = authService;
+        User currentUser = authService.getCurrentUser();
+        userID = currentUser.getId();
+        courses = usersRepository.findCourses(userID);
     }
+
 
     public Course createCourse(int userID, String courseName)
     {
@@ -30,36 +40,43 @@ public class CourseService {
 
         int currentUserID = authService.getCurrentUser().getId();
 
+        // check if name already exists in the courses, if so, return NULL (course name taken)
         for(Course course:courses) {
             if (courseName.equals(course.getCourseName())) {
                 return null;
             }
         }
-        Course newcourse = Course.builder().courseId(nextID).courseName(courseName).userId(currentUserID).build();
+        Course newcourse = Course.builder()
+                .courseId(nextID)
+                .courseName(courseName)
+                .userId(currentUserID)
+                .build();
+
         courses.add(newcourse);
+        usersRepository.addCourse(currentUserID);
+
         authService.getCurrentUser().getUserCourses().add(nextID);
         nextID += 1;
         return newcourse;
-        // check if name already exists in the courses, if so, return NULL (course name taken)
-        // if fine, create the course object using the model, PASS THE USER ID TOO!
-        // push to array and return the course
+
     }
 
     public Course getCourseByID(int userID, int courseID) {
+
         // no logged-in user
         if (authService.getCurrentUser() == null)
             return null;
 
         int currentUserID = authService.getCurrentUser().getId();
 
-        boolean there = false;
+        boolean courseAlreadyThere = false;
 
         for(int course:authService.getCurrentUser().getUserCourses()) {
             if(course == courseID) {
-                there = true;
+                courseAlreadyThere = true;
             }
         }
-        if(there) {
+        if(courseAlreadyThere) {
             for (Course course : courses) {
                 if (course.getCourseId() == courseID) {
                     return course;
@@ -83,6 +100,7 @@ public class CourseService {
         for(int course:authService.getCurrentUser().getUserCourses()) {
             if (course == courseID) {
                 getCourseByID(userID,courseID).setCourseName(newCourseName);
+                usersRepository.renameCourse(currentUserID,courseID);
                 return getCourseByID(userID,courseID);
             }
         }
@@ -106,6 +124,7 @@ public class CourseService {
             if (course == courseID) {
                 courses.remove(getCourseByID(userID,courseID));
                 authService.getCurrentUser().getUserCourses().remove(Integer.valueOf(courseID));
+                usersRepository.deleteCourse(userID, courseID);
                 return true;
             }
         }

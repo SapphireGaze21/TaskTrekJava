@@ -49,5 +49,6 @@ public class User{
 
     @Builder.Default
     private Map<String, SkillProgress> skillProgress = new HashMap<>(); // courseName → SkillProgress
+
     //have to decide method to decide the level for a course
 }
