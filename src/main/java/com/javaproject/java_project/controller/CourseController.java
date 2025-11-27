@@ -27,7 +27,7 @@ public class CourseController {
 
     @GetMapping("/{courseId}")
     public String taskList(@PathVariable int courseId) {
-
+        String myTasks = courseService.getTasks(courseId);
         return "Task List shown";
     }
 

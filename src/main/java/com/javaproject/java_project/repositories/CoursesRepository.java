@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface CoursesRepository extends MongoRepository {
-    public List<Course> f
+
 }

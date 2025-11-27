@@ -31,7 +31,7 @@ public class CourseService {
         courses = usersRepository.findCourses(userID);
     }
 
-
+    public String
     public Course createCourse(int userID, String courseName)
     {
         // no logged-in user
