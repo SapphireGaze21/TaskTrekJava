@@ -14,4 +14,7 @@ public interface UsersRepository extends MongoRepository<User, Integer> {
     boolean usernameExists(String username);
 
     List<Course> findCourses(int userID);
+    void addCourse(int userID);
+    void renameCourse(int userID, int courseID);
+    void deleteCourse(int userID, int courseID);
 }

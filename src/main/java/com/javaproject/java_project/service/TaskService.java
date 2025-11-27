@@ -165,7 +165,9 @@ public class TaskService {
         // if not, return NULL (task not found)
         // add xp, level up etc etc etc
         User currentUser = authService.getCurrentUser();
-        if(currentUser == null) return false;
+        if(currentUser == null){
+            return false;
+        }
 
         if(courseService.getCourseByID(currentUser.getId(), courseID) == null){
             return false;

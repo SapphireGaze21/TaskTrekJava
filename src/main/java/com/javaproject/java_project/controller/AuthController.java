@@ -1,40 +1,54 @@
 package com.javaproject.java_project.controller;
 
-import com.javaproject.java_project.model.LoginRequest;
-import com.javaproject.java_project.model.SignupRequest;
+import com.javaproject.java_project.request.LoginRequest;
 import com.javaproject.java_project.model.User;
-import com.javaproject.java_project.repositories.UsersRepository;
+import com.javaproject.java_project.request.SignupRequest;
 import com.javaproject.java_project.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Objects;
 
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController 
 {
-    @Autowired
-    AuthService authService;
+    private final AuthService authService;
 
-    @Autowired
-    User user;
+    public AuthController(AuthService authService)
+    {
+        this.authService = authService;
+    }
 
     @PostMapping("/register")
-    public String register(@org.jetbrains.annotations.NotNull @RequestBody SignupRequest signupDetails)
+    public ResponseEntity<?> register(@org.jetbrains.annotations.NotNull @RequestBody SignupRequest signupDetails)
     {
-        //user = authService.registerUser(signupDetails.getUsername(), signupDetails.getPassword());
-        return authService.registerUser(signupDetails.getUsername(), signupDetails.getPassword());
+        // trim will take care of strings with just spaces (they are empty)
+        if (signupDetails.getUsername() == null || signupDetails.getUsername().trim().isEmpty())
+            return new ResponseEntity<>("Username cannot be empty", HttpStatus.BAD_REQUEST);
+
+        if (signupDetails.getPassword() == null || signupDetails.getPassword().trim().isEmpty())
+            return new ResponseEntity<>("Password cannot be empty", HttpStatus.BAD_REQUEST);
+        
+        User created = authService.registerUser(signupDetails.getUsername(), signupDetails.getPassword());
+
+        if (created == null)
+            return new ResponseEntity<>( "Username already exists.", HttpStatus.CONFLICT);
+        else
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public String login(@org.jetbrains.annotations.NotNull @RequestBody LoginRequest loginCredentials)
+    public ResponseEntity<?> login(@org.jetbrains.annotations.NotNull @RequestBody LoginRequest loginCreds)
     {
-        //user = authService.loginUser(loginCredentials.getUsername(), loginCredentials.getPassword());
-        return authService.loginUser(loginCredentials.getUsername(), loginCredentials.getPassword());
+        User loggedIn = authService.loginUser(loginCreds.getUsername(), loginCreds.getPassword());
+
+        if (loggedIn == null)
+            return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
+        else
+            return new ResponseEntity<>(loggedIn, HttpStatus.OK);
     }
 }

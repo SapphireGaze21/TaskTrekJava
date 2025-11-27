@@ -1,5 +1,6 @@
 package com.javaproject.java_project.controller;
 
+import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
 import com.javaproject.java_project.repositories.UsersRepository;
 import com.javaproject.java_project.service.CourseService;
@@ -16,12 +17,19 @@ public class CourseController {
     @GetMapping
     public String dashBoard()
     {
-
-        return "Dashboard shown";
+        String dashboard = "";
+        for(Course course:courseService.getCourses()){
+            dashboard+= course.getCourseName();
+            dashboard+="\n";
+        }
+        return dashboard+"Dashboard shown";
     }
 
     @GetMapping("/{courseId}")
-    public String taskList(@PathVariable int courseId) { return "Task List shown";}
+    public String taskList(@PathVariable int courseId) {
+
+        return "Task List shown";
+    }
 
     @PostMapping
     public String addCourse()
