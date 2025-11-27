@@ -1,6 +1,8 @@
 package com.javaproject.java_project.model;
 
-import lombok.Data;
+import lombok.*;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 
 
@@ -8,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Data
 @Builder
 @AllArgsConstructor
 

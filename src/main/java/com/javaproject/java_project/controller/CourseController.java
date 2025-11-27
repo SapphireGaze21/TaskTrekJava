@@ -2,44 +2,101 @@ package com.javaproject.java_project.controller;
 
 import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
+import com.javaproject.java_project.request.NewCourseRequest;
 import com.javaproject.java_project.repositories.UsersRepository;
+import com.javaproject.java_project.service.AuthService;
 import com.javaproject.java_project.service.CourseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/courses")
-public class CourseController {
+public class CourseController
+{
+    private final AuthService authService;
+    private final CourseService courseService;
 
-    @Autowired
-    CourseService courseService;
+    public CourseController(AuthService authService, CourseService courseService)
+    {
+        this.authService = authService;
+        this.courseService = courseService;
+    }
 
     @GetMapping
-    public String dashBoard()
+    public ResponseEntity<?> dashBoard()
     {
-        String dashboard = "";
-        for(Course course:courseService.getCourses()){
-            dashboard+= course.getCourseName();
-            dashboard+="\n";
-        }
-        return dashboard+"Dashboard shown";
+        User currentUser = authService.getCurrentUser();
+        if (currentUser == null)
+            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
+
+        List<Course> courses = courseService.getCourses();
+        return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @GetMapping("/{courseId}")
-    public String taskList(@PathVariable int courseId) {
-        String myTasks = courseService.getTasks(courseId);
-        return "Task List shown";
+    public ResponseEntity<?> taskList(@PathVariable int courseId)
+    {
+        User currentUser = authService.getCurrentUser();
+        if (currentUser == null)
+            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
+
+        Course toShow = courseService.getCourseByID(courseId);
+        if (toShow == null)
+            return new ResponseEntity<>("Course Not Found", HttpStatus.NOT_FOUND);
+
+        // returns integers for taskIDs for now
+        return new ResponseEntity<>(toShow.getTasks(), HttpStatus.OK);
     }
 
     @PostMapping
-    public String addCourse()
+    public ResponseEntity<?> createCourse(@org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails)
     {
-        return "Course added";
+        User currentUser = authService.getCurrentUser();
+        if (currentUser == null)
+            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
+
+        // trim will take care of strings with just spaces (they are empty)
+        if (newCourseDetails.getCoursename() == null || newCourseDetails.getCoursename().trim().isEmpty())
+            return new ResponseEntity<>("Course Name cannot be empty", HttpStatus.BAD_REQUEST);
+
+        Course created = courseService.createCourse(newCourseDetails.getCoursename());
+
+        if (created == null)
+            return new ResponseEntity<>( "Course Name already exists.", HttpStatus.CONFLICT);
+        else
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{courseId}")
-    public String removeCourse(@PathVariable int courseId)
+    public ResponseEntity<?> removeCourse(@PathVariable int courseId)
     {
-        return "Course Removed";
+        User currentUser = authService.getCurrentUser();
+        if (currentUser == null)
+            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
+
+        boolean deleted = courseService.deleteCourse(courseId);
+
+        if (!deleted)
+            return new ResponseEntity<>("Course does not Exist.",HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>("Course deleted", HttpStatus.NO_CONTENT); // fetch the course name
+    }
+
+    @PutMapping("/{courseId}")
+    public ResponseEntity<?> renameCourse(@PathVariable int courseId, @org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails)
+    {
+        User currentUser = authService.getCurrentUser();
+        if (currentUser == null)
+            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
+
+        Course toRename = courseService.renameCourse(courseId, newCourseDetails.getCoursename());
+
+        if (toRename == null)
+            return new ResponseEntity<>("Course does not Exist.",HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>("Course renamed to '" + toRename.getCourseName() + "'", HttpStatus.OK);
     }
 }
