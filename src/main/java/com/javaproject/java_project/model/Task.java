@@ -6,6 +6,13 @@ import java.time.LocalDateTime;
 
 @Data
 
+@Getter
+@Setter
+@Data
+@Builder
+@AllArgsConstructor
+
+@Component
 public class Task {
     private int taskID;
     private String title;
