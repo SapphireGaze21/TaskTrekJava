@@ -1,8 +1,8 @@
-### Project: TaskTrek - a Gamified Task Tracker (Java Spring Boot)
+### TaskTrek - a Gamified Task Tracker (Java Spring Boot)
 
 ## Overview
 
-A gamified task manager inspired by Google Tasks, where users manage courses and tasks — earning XP and levels as they complete them.
+A gamified task manager inspired by Google Tasks & Duolingo, where users manage courses and tasks — earning XP and levels as they complete them.
 Built with Spring Boot in Java.
 
 Users can:-
