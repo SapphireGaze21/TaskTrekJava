@@ -45,7 +45,7 @@ public class TaskService {
         }
 
         Task task = Task.builder()
-                .TaskID(nextID++)
+                .taskID(nextID++)
                 .OwnerUserID(currentUser.getId())
                 .CourseID(courseID)
                 .Title(title)
