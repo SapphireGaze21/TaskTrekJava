@@ -44,15 +44,15 @@ public class TaskService {
             return null;
         }
 
-        Task task = new Task();
-        task.setTaskID(nextID++);
-        task.setOwnerUserID(currentUser.getId());
-        task.setCourseID(courseID);
-        task.setTitle(title);
-        task.setDescription(description);
-        task.setCompleted(false);
-        task.setDeadline(deadline);
-        task.setDifficulty(difficulty);
+        Task task = Task.builder()
+                .TaskID(nextID++)
+                .OwnerUserID(currentUser.getId())
+                .CourseID(courseID)
+                .Title(title)
+                .Description(description)
+                .Completed(false)
+                .Deadline(deadline)
+                .Difficulty(difficulty)
 
         if(difficulty.equalsIgnoreCase("HARD")){
             task.setBaseXP(100);

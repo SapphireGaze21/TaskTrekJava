@@ -1,13 +1,19 @@
 package com.javaproject.java_project.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 
 
-@Builder
 @Data
 
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+
+@Component
 public class Task {
     private int taskID;
     private String title;
