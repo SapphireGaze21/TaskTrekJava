@@ -1,9 +1,11 @@
 package com.javaproject.java_project.model;
 
+import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
 
 
+@Builder
 @Data
 
 public class Task {
