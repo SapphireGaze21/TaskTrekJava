@@ -52,7 +52,7 @@ public class TaskService {
                 .Description(description)
                 .Completed(false)
                 .Deadline(deadline)
-                .Difficulty(difficulty)
+                .Difficulty(difficulty);
 
         if(difficulty.equalsIgnoreCase("HARD")){
             task.setBaseXP(100);
