@@ -59,10 +59,10 @@ public class CourseController
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
 
         // trim will take care of strings with just spaces (they are empty)
-        if (newCourseDetails.getCoursename() == null || newCourseDetails.getCoursename().trim().isEmpty())
+        if (newCourseDetails.getCourseName() == null || newCourseDetails.getCourseName().trim().isEmpty())
             return new ResponseEntity<>("Course Name cannot be empty", HttpStatus.BAD_REQUEST);
 
-        Course created = courseService.createCourse(newCourseDetails.getCoursename());
+        Course created = courseService.createCourse(newCourseDetails.getCourseName());
 
         if (created == null)
             return new ResponseEntity<>( "Course Name already exists.", HttpStatus.CONFLICT);
@@ -92,7 +92,7 @@ public class CourseController
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
 
-        Course toRename = courseService.renameCourse(courseId, newCourseDetails.getCoursename());
+        Course toRename = courseService.renameCourse(courseId, newCourseDetails.getCourseName());
 
         if (toRename == null)
             return new ResponseEntity<>("Course does not Exist.",HttpStatus.NOT_FOUND);
