@@ -15,7 +15,7 @@ import java.util.*;
 @AllArgsConstructor
 @Builder
 @Data
-
+@NoArgsConstructor
 @Component
 @Document(collection = "users")
 public class User{
@@ -40,7 +40,7 @@ public class User{
     private LocalDate lastActiveDate = LocalDate.now();
 
     @Builder.Default
-    List<Integer> userCourses = new ArrayList<>();
+    List<Course> userCourses = new ArrayList<>();
 
     @Builder.Default
     private List<Achievement> achievements = new ArrayList<>();

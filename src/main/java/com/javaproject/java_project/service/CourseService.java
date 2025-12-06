@@ -3,12 +3,12 @@ package com.javaproject.java_project.service;
 import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
 import com.javaproject.java_project.repositories.UsersRepository;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class CourseService {
@@ -35,13 +35,10 @@ public class CourseService {
             return new ArrayList<>();
 
         int currentUserID = currentUser.getId();
-        List<Course> result = new ArrayList<>();
-        for (Course course : courses)
-        {
-            if (course.getUserId() == currentUserID)
-                result.add(course);
-        }
-        return result;
+        Optional<User> temp_user = usersRepository.findById(currentUserID);
+        courses = temp_user.get().getUserCourses();
+
+        return courses;
     }
 
     public Course createCourse(String courseName)
