@@ -66,9 +66,10 @@ public class CourseService {
 
         courses.add(newcourse);
 
-        if (currentUser.getUserCourses() != null)
-            currentUser.getUserCourses().add(nextID);
-        usersRepository.addCourse(currentUserID);
+        if (currentUser.getUserCourses() != null) {
+            currentUser.getUserCourses().add(newcourse);
+            usersRepository.save(currentUser);
+        }
 
         nextID++;
         return newcourse;
@@ -118,7 +119,7 @@ public class CourseService {
             return null;
 
         course.setCourseName(newCourseName);
-        usersRepository.renameCourse(currentUserID, courseID);
+        usersRepository.save(currentUser);
 
         return course;
         // check if courseID matches any of the course list IDs
@@ -144,7 +145,7 @@ public class CourseService {
         courses.remove(course);
 
         currentUser.getUserCourses().remove(Integer.valueOf(courseID));
-        usersRepository.deleteCourse(currentUserID, courseID);
+        usersRepository.save(currentUser);
         return true;
 
         // if not, return NULL (course not found)
