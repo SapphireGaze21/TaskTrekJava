@@ -2,6 +2,7 @@ package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
+import com.javaproject.java_project.repositories.CoursesRepository;
 import com.javaproject.java_project.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ public class CourseService {
 
     @Autowired
     UsersRepository usersRepository;
+    CoursesRepository coursesRepository;
 
     private int nextID = 1; // autoincrement this for next courses
 
@@ -74,6 +76,7 @@ public class CourseService {
         return newcourse;
     }
 
+    // Tasks of a specific course
     public Course getCourseByID(int courseID)
     {
         User currentUser = authService.getCurrentUser();

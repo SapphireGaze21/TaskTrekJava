@@ -4,6 +4,7 @@ import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
 import com.javaproject.java_project.request.NewCourseRequest;
 import com.javaproject.java_project.repositories.UsersRepository;
+import com.javaproject.java_project.repositories.CoursesRepository;
 import com.javaproject.java_project.service.AuthService;
 import com.javaproject.java_project.service.CourseService;
 import org.springframework.http.HttpStatus;
@@ -14,20 +15,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/courses")
-public class CourseController
-{
+public class CourseController {
     private final AuthService authService;
     private final CourseService courseService;
 
-    public CourseController(AuthService authService, CourseService courseService)
-    {
+    public CourseController(AuthService authService, CourseService courseService) {
         this.authService = authService;
         this.courseService = courseService;
     }
 
     @GetMapping
-    public ResponseEntity<?> dashBoard()
-    {
+    public ResponseEntity<?> dashBoard() {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
@@ -37,8 +35,7 @@ public class CourseController
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<?> taskList(@PathVariable int courseId)
-    {
+    public ResponseEntity<?> taskList(@PathVariable int courseId) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
@@ -52,8 +49,7 @@ public class CourseController
     }
 
     @PostMapping
-    public ResponseEntity<?> createCourse(@org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails)
-    {
+    public ResponseEntity<?> createCourse(@org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
@@ -65,14 +61,13 @@ public class CourseController
         Course created = courseService.createCourse(newCourseDetails.getCourseName());
 
         if (created == null)
-            return new ResponseEntity<>( "Course Name already exists.", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Course Name already exists.", HttpStatus.CONFLICT);
         else
             return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{courseId}")
-    public ResponseEntity<?> removeCourse(@PathVariable int courseId)
-    {
+    public ResponseEntity<?> removeCourse(@PathVariable int courseId) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
@@ -80,14 +75,13 @@ public class CourseController
         boolean deleted = courseService.deleteCourse(courseId);
 
         if (!deleted)
-            return new ResponseEntity<>("Course does not Exist.",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Course does not Exist.", HttpStatus.NOT_FOUND);
         else
             return new ResponseEntity<>("Course deleted", HttpStatus.NO_CONTENT); // fetch the course name
     }
 
     @PutMapping("/{courseId}")
-    public ResponseEntity<?> renameCourse(@PathVariable int courseId, @org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails)
-    {
+    public ResponseEntity<?> renameCourse(@PathVariable int courseId, @org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
@@ -95,7 +89,7 @@ public class CourseController
         Course toRename = courseService.renameCourse(courseId, newCourseDetails.getCourseName());
 
         if (toRename == null)
-            return new ResponseEntity<>("Course does not Exist.",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Course does not Exist.", HttpStatus.NOT_FOUND);
         else
             return new ResponseEntity<>("Course renamed to '" + toRename.getCourseName() + "'", HttpStatus.OK);
     }

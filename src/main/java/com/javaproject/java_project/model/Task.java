@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Component
 public class Task {
     private int taskID;
+    private int courseID;
     private String title;
     private String description;
     private int baseXP;
