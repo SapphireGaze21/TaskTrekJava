@@ -36,7 +36,8 @@ public class CourseService {
 
         int currentUserID = currentUser.getId();
         Optional<User> temp_user = usersRepository.findById(currentUserID);
-        courses = temp_user.get().getUserCourses();
+
+        temp_user.ifPresent(user -> courses = user.getUserCourses());
 
         return courses;
     }
@@ -46,27 +47,25 @@ public class CourseService {
         User currentUser = authService.getCurrentUser();
 
         // no logged-in user
-        if (authService.getCurrentUser() == null)
+        if (currentUser == null)
             return null;
-
-        int currentUserID = currentUser.getId();
 
         // check if name already exists in the courses, if so, return NULL (course name taken)
         for(Course course : courses)
         {
-            if (courseName.equals(course.getCourseName()) && course.getUserId() == currentUserID)
+            if (courseName.equals(course.getCourseName()))
                 return null;
         }
 
         Course newcourse = Course.builder()
                 .courseId(nextID)
                 .courseName(courseName)
-                .userId(currentUserID)
                 .build();
 
         courses.add(newcourse);
 
-        if (currentUser.getUserCourses() != null) {
+        if (currentUser.getUserCourses() != null)
+        {
             currentUser.getUserCourses().add(newcourse);
             usersRepository.save(currentUser);
         }
@@ -80,14 +79,12 @@ public class CourseService {
         User currentUser = authService.getCurrentUser();
 
         // no logged-in user
-        if (authService.getCurrentUser() == null)
+        if (currentUser == null)
             return null;
-
-        int currentUserID = authService.getCurrentUser().getId();
 
         for (Course course : courses)
         {
-            if (course.getCourseId() == courseID && course.getUserId() == currentUserID)
+            if (course.getCourseId() == courseID)
                 return course;
         }
 
@@ -102,15 +99,13 @@ public class CourseService {
         User currentUser = authService.getCurrentUser();
 
         // no logged-in user
-        if (authService.getCurrentUser() == null)
+        if (currentUser == null)
             return null;
-
-        int currentUserID = authService.getCurrentUser().getId();
 
         for (Course course : courses)
         {
             // name clash
-            if (course.getUserId() == currentUserID && course.getCourseId() != courseID && course.getCourseName().equals(newCourseName))
+            if (course.getCourseId() != courseID && course.getCourseName().equals(newCourseName))
                 return null;
         }
 
@@ -136,15 +131,13 @@ public class CourseService {
         if (authService.getCurrentUser() == null)
             return false;
 
-        int currentUserID = authService.getCurrentUser().getId();
-
         Course course = getCourseByID(courseID);
         if (course == null)
             return false;
 
         courses.remove(course);
 
-        currentUser.getUserCourses().remove(Integer.valueOf(courseID));
+        currentUser.getUserCourses().remove(course);
         usersRepository.save(currentUser);
         return true;
 

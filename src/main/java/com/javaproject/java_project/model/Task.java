@@ -20,8 +20,6 @@ public class Task {
     private String description;
     private int baseXP;
     private double multiplier;
-    private int courseID;
-    private int ownerUserID;
     private boolean completed;
     private LocalDateTime deadline;
     private String difficulty;

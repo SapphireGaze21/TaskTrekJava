@@ -25,20 +25,20 @@ public class TaskController
         return "Task Created";
     }
 
-    @PutMapping("/{taskid}")
-    public String editTask(@PathVariable int taskid)
+    @PutMapping("/{taskId}")
+    public String editTask(@PathVariable int taskId)
     {
         return "Task Edited";
     }
 
-    @DeleteMapping("/{taskid}")
-    public String deleteTask(@PathVariable int taskid)
+    @DeleteMapping("/{taskId}")
+    public String deleteTask(@PathVariable int taskId)
     {
         return "Task Deleted";
     }
 
-    @PostMapping("/{taskid}/complete")
-    public String completeTask(@PathVariable int taskid)
+    @PostMapping("/{taskId}/complete")
+    public String completeTask(@PathVariable int taskId)
     {
         return "Task Complete";
     }
