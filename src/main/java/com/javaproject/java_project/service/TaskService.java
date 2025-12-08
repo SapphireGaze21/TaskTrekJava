@@ -6,14 +6,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.ArrayList;
 
 @Service
 public class TaskService
 {
     // In memory list of tasks
     // Going to have courseID in the task
-    private List<Task> tasks;
+    List<Task> tasks;
 
     private int nextID = 1; // autoincrement this for next tasks
 
@@ -120,8 +119,6 @@ public class TaskService
         if (currentUser == null)
             return null;
 
-        Course currentCourse = courseService.getCourseByID(courseID);
-
         Task taskToEdit = getTaskByID(taskID);
 
         // checking if the same courseID is used
@@ -147,8 +144,6 @@ public class TaskService
         User currentUser = authService.getCurrentUser();
         if(currentUser == null)
             return false;
-
-        Course currentCourse = courseService.getCourseByID(courseID);
 
         Task taskToDelete = getTaskByID(taskID);
 
