@@ -1,7 +1,6 @@
 package com.javaproject.java_project.model;
 
 import lombok.*;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 
-@Component
 public class Course
 {
     private int courseId;

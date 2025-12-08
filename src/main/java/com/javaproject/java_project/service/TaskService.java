@@ -1,12 +1,10 @@
 package com.javaproject.java_project.service;
 
-import com.javaproject.java_project.model.Task;
-import com.javaproject.java_project.model.User;
+import com.javaproject.java_project.model.*;
 import com.javaproject.java_project.repositories.CoursesRepository;
 import com.javaproject.java_project.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.javaproject.java_project.model.Course;
 
 
 import java.time.LocalDateTime;
@@ -54,7 +52,7 @@ public class TaskService
         return result;
     }
 
-    public Task createTask(int courseId, String title, String description, LocalDateTime deadline, String difficulty)
+    public Task createTask(int courseId, String taskType, String title, String description, LocalDateTime deadline)
     {
         // create the task object using the model, PASS THE COURSE ID TOO!
         // push to array and return the task
@@ -64,32 +62,65 @@ public class TaskService
         if(currentUser == null)
             return null;
 
-        Task task = Task.builder()
-                .taskID(nextID++)
-                .courseID(courseId)
-                .title(title)
-                .description(description)
-                .completed(false)
-                .deadline(deadline)
-                .build();
-                //.difficulty(difficulty); to change
+        Task task;
 
-        // to be inherited
-        /*
-        if(difficulty.equalsIgnoreCase("HARD")){
-            task.setBaseXP(100);
-            task.setMultiplier(2.0);
-        }
-        else if(difficulty.equalsIgnoreCase("MEDIUM")){
-            task.setBaseXP(80);
-            task.setMultiplier(1.5);
-        }
-        else{
-            task.setBaseXP(50);
-            task.setMultiplier(1.0);
-        }
-        */
+        switch(taskType.toUpperCase()) {
 
+            case "ASSIGNMENT":
+                task = AssignmentTask.builder()
+                        .taskID(nextID++)
+                        .courseID(courseId)
+                        .title(title)
+                        .description(description)
+                        .deadline(deadline)
+                        .completed(false)
+                        .build();
+                break;
+
+            case "PROJECT":
+                task = ProjectTask.builder()
+                        .taskID(nextID++)
+                        .courseID(courseId)
+                        .title(title)
+                        .description(description)
+                        .deadline(deadline)
+                        .completed(false)
+                        .build();
+                break;
+
+            case "QUIZPREP":
+                task = QuizPrepTask.builder()
+                        .taskID(nextID++)
+                        .courseID(courseId)
+                        .title(title)
+                        .description(description)
+                        .deadline(deadline)
+                        .completed(false)
+                        .build();
+                break;
+
+            case "EXAMPREP":
+                task = ExamPrepTask.builder()
+                        .taskID(nextID++)
+                        .courseID(courseId)
+                        .title(title)
+                        .description(description)
+                        .deadline(deadline)
+                        .completed(false)
+                        .build();
+                break;
+
+            default:
+                task = Task.builder()
+                        .taskID(nextID++)
+                        .courseID(courseId)
+                        .title(title)
+                        .description(description)
+                        .deadline(deadline)
+                        .completed(false)
+                        .build();
+        }
+        task.configureXp();
         tasks.add(task);
         return task;
     }
@@ -113,7 +144,7 @@ public class TaskService
         return null;
     }
 
-    public Task editTask(int courseID, int taskID, String newTitle, String newDesc, LocalDateTime newDeadline, String newDifficulty)
+    public Task editTask(int courseID, int taskID, String newTitle, String newDesc, LocalDateTime newDeadline)
     {
         // check if taskID matches any of the taskToEdit list IDs
         // if not, return NULL (taskToEdit not found)
@@ -136,27 +167,6 @@ public class TaskService
             taskToEdit.setDescription(newDesc);
         if (newDeadline != null)
             taskToEdit.setDeadline(newDeadline);
-
-        if (newDifficulty != null)
-        {
-            taskToEdit.setDifficulty(newDifficulty);
-
-            if (newDifficulty.equalsIgnoreCase("HARD"))
-            {
-                taskToEdit.setBaseXP(100);
-                taskToEdit.setMultiplier(2.0);
-            }
-            else if (newDifficulty.equalsIgnoreCase("MEDIUM"))
-            {
-                taskToEdit.setBaseXP(80);
-                taskToEdit.setMultiplier(1.5);
-            }
-            else
-            {
-                taskToEdit.setBaseXP(50);
-                taskToEdit.setMultiplier(1.0);
-            }
-        }
 
         return taskToEdit;
     }

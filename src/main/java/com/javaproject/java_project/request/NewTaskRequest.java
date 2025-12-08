@@ -13,5 +13,5 @@ public class NewTaskRequest
     private String title;
     private String description;
     private LocalDateTime deadline;
-    private String difficulty;
+    private String taskType;
 }

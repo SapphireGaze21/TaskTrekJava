@@ -13,5 +13,5 @@ public class EditedTaskRequest
     private String title;
     private String description;
     private LocalDateTime deadline;
-    private String difficulty;
+
 }

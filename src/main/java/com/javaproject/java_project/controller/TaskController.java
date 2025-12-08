@@ -29,13 +29,13 @@ public class TaskController
     }
 
     @GetMapping
-    public ResponseEntity<?> getTasks(@PathVariable int courseID)
+    public ResponseEntity<?> getTasks(@PathVariable int courseId)
     {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
 
-        List<Task> tasks = taskService.getTasksForCourse(courseID);
+        List<Task> tasks = taskService.getTasksForCourse(courseId);
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
@@ -52,10 +52,11 @@ public class TaskController
 
         Task created = taskService.createTask(
                 courseId,
+                newTaskDetails.getTaskType(),
                 newTaskDetails.getTitle(),
                 newTaskDetails.getDescription(),
-                newTaskDetails.getDeadline(),
-                newTaskDetails.getDifficulty() // to modify for task types
+                newTaskDetails.getDeadline()
+
         );
 
         if (created == null)
@@ -75,13 +76,14 @@ public class TaskController
         if (editedTaskDetails.getTitle() == null || editedTaskDetails.getTitle().trim().isEmpty())
             return new ResponseEntity<>("Task Name cannot be empty", HttpStatus.BAD_REQUEST);
 
-        Task updated = taskService.createTask(
+        Task updated = taskService.editTask(
                 courseId,
+                taskId,
                 editedTaskDetails.getTitle(),
                 editedTaskDetails.getDescription(),
-                editedTaskDetails.getDeadline(),
-                editedTaskDetails.getDifficulty()
+                editedTaskDetails.getDeadline()
         );
+
 
         if (updated == null)
             return new ResponseEntity<>("Task could not be created", HttpStatus.BAD_REQUEST);

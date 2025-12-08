@@ -1,7 +1,7 @@
 package com.javaproject.java_project.model;
 
 import lombok.*;
-import org.springframework.stereotype.Component;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -10,18 +10,24 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 
-@Component
 public class Task {
     private int taskID;
     private int courseID;
     private String title;
     private String description;
-    private int baseXP;
-    private double multiplier;
+    protected int baseXP;
+    protected double multiplier;
     private boolean completed;
     private LocalDateTime deadline;
-    private String difficulty;
+
+    public void configureXp() {
+        // Generic ungraded task
+        this.baseXP = 50;
+        this.multiplier = 1.0;
+    }
+
 }
