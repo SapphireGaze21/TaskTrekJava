@@ -2,19 +2,21 @@ package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
+import com.javaproject.java_project.repositories.CoursesRepository;
 import com.javaproject.java_project.repositories.UsersRepository;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class CourseService {
 
     @Autowired
     UsersRepository usersRepository;
+    CoursesRepository coursesRepository;
 
     private int nextID = 1; // autoincrement this for next courses
 
@@ -35,13 +37,11 @@ public class CourseService {
             return new ArrayList<>();
 
         int currentUserID = currentUser.getId();
-        List<Course> result = new ArrayList<>();
-        for (Course course : courses)
-        {
-            if (course.getUserId() == currentUserID)
-                result.add(course);
-        }
-        return result;
+        Optional<User> temp_user = usersRepository.findById(currentUserID);
+
+        temp_user.ifPresent(user -> courses = user.getUserCourses());
+
+        return courses;
     }
 
     public Course createCourse(String courseName)
@@ -49,47 +49,45 @@ public class CourseService {
         User currentUser = authService.getCurrentUser();
 
         // no logged-in user
-        if (authService.getCurrentUser() == null)
+        if (currentUser == null)
             return null;
-
-        int currentUserID = currentUser.getId();
 
         // check if name already exists in the courses, if so, return NULL (course name taken)
         for(Course course : courses)
         {
-            if (courseName.equals(course.getCourseName()) && course.getUserId() == currentUserID)
+            if (courseName.equals(course.getCourseName()))
                 return null;
         }
 
         Course newcourse = Course.builder()
                 .courseId(nextID)
                 .courseName(courseName)
-                .userId(currentUserID)
                 .build();
 
         courses.add(newcourse);
 
         if (currentUser.getUserCourses() != null)
-            currentUser.getUserCourses().add(nextID);
-        usersRepository.addCourse(currentUserID);
+        {
+            currentUser.getUserCourses().add(newcourse);
+            usersRepository.save(currentUser);
+        }
 
         nextID++;
         return newcourse;
     }
 
+    // Tasks of a specific course
     public Course getCourseByID(int courseID)
     {
         User currentUser = authService.getCurrentUser();
 
         // no logged-in user
-        if (authService.getCurrentUser() == null)
+        if (currentUser == null)
             return null;
-
-        int currentUserID = authService.getCurrentUser().getId();
 
         for (Course course : courses)
         {
-            if (course.getCourseId() == courseID && course.getUserId() == currentUserID)
+            if (course.getCourseId() == courseID)
                 return course;
         }
 
@@ -104,15 +102,13 @@ public class CourseService {
         User currentUser = authService.getCurrentUser();
 
         // no logged-in user
-        if (authService.getCurrentUser() == null)
+        if (currentUser == null)
             return null;
-
-        int currentUserID = authService.getCurrentUser().getId();
 
         for (Course course : courses)
         {
             // name clash
-            if (course.getUserId() == currentUserID && course.getCourseId() != courseID && course.getCourseName().equals(newCourseName))
+            if (course.getCourseId() != courseID && course.getCourseName().equals(newCourseName))
                 return null;
         }
 
@@ -121,7 +117,7 @@ public class CourseService {
             return null;
 
         course.setCourseName(newCourseName);
-        usersRepository.renameCourse(currentUserID, courseID);
+        usersRepository.save(currentUser);
 
         return course;
         // check if courseID matches any of the course list IDs
@@ -138,16 +134,14 @@ public class CourseService {
         if (authService.getCurrentUser() == null)
             return false;
 
-        int currentUserID = authService.getCurrentUser().getId();
-
         Course course = getCourseByID(courseID);
         if (course == null)
             return false;
 
         courses.remove(course);
 
-        currentUser.getUserCourses().remove(Integer.valueOf(courseID));
-        usersRepository.deleteCourse(currentUserID, courseID);
+        currentUser.getUserCourses().remove(course);
+        usersRepository.save(currentUser);
         return true;
 
         // if not, return NULL (course not found)

@@ -16,12 +16,11 @@ import java.time.LocalDateTime;
 @Component
 public class Task {
     private int taskID;
+    private int courseID;
     private String title;
     private String description;
     private int baseXP;
     private double multiplier;
-    private int courseID;
-    private int ownerUserID;
     private boolean completed;
     private LocalDateTime deadline;
     private String difficulty;

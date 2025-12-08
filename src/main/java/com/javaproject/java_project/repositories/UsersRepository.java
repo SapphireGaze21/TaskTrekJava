@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UsersRepository extends MongoRepository<User, Integer> {
-    User findByUsername(String username);
+public interface UsersRepository extends MongoRepository<User, Integer>{
+   /* User findByUsername(String username);
     String returnPasswordHash(String username);
     boolean usernameExists(String username);
 
@@ -19,5 +19,5 @@ public interface UsersRepository extends MongoRepository<User, Integer> {
     void renameCourse(int userID, int courseID);
     void deleteCourse(int userID, int courseID);
 
-    List<Task> getTasks(int userID, int courseID);
+    List<Task> getTasks(int userID, int courseID);*/
 }

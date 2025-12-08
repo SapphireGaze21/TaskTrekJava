@@ -19,5 +19,5 @@ public class Course
     private String courseName;
     private int userId; // owner
     @Builder.Default
-    private List<Integer> tasks = new ArrayList<>(); // stored by IDs
+    private List<Task> tasks = new ArrayList<>(); // stored by IDs
 }
