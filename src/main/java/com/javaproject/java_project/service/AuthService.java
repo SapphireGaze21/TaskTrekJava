@@ -1,19 +1,17 @@
 package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.User;
-import com.javaproject.java_project.repositories.UsersRepository;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AuthService
 {
-    @Autowired
-    UsersRepository usersRepository;
-
     // In memory Database for now, Mongo later
-    //private List<User> users = usersRepository.find;
+    private final List<User> users = new ArrayList<>();
     private int nextID = 1; // autoincrement this for registering users
 
     // helper so other services can know who is logged in
@@ -23,22 +21,24 @@ public class AuthService
 
     public User registerUser(String username, String password)
     {
-        boolean usernameAlreadyExists = usersRepository.usernameExists(username);
-
-        if (usernameAlreadyExists)
+        for (User user : users)
         {
-            System.out.println("Username taken.");
-            return null;
+            if (user.getUsername().equals(username))
+            {
+                System.out.println("Username taken.");
+                return null;
+            }
         }
 
-        User newuser = User.builder()
+        User newUser = User.builder()
                 .id(nextID)
                 .username(username)
                 .passwordHash(password)
                 .build();
         nextID++;
 
-        return usersRepository.insert(newuser);
+        users.add(newUser);
+        return newUser;
     }
         // check if username already exists, if so, return null (username taken)
         // if fine, create new user with the ID, username, passwordHash (just store the normal pwd for now)
@@ -48,7 +48,13 @@ public class AuthService
 
     public User loginUser(String username, String password)
     {
-        User user = usersRepository.findByUsername(username);
+        User user = null;
+
+        for (User check : users)
+        {
+            if (check.getUsername().equals(username))
+                user = check;
+        }
 
         if (user == null)
         {
@@ -69,7 +75,7 @@ public class AuthService
     }
 
         // check if user exists in the list, if not just null
-        // If exists check if pwd matches what's there in the users list (simple string comp for now)
+        // If exists, check if pwd matches what's there in the users list (simple string comp for now)
         // Match => return user
         // Else => Exception
 }

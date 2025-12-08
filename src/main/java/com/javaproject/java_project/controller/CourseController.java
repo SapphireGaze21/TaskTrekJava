@@ -42,7 +42,6 @@ public class CourseController {
         if (toShow == null)
             return new ResponseEntity<>("Course Not Found", HttpStatus.NOT_FOUND);
 
-        // returns integers for taskIDs for now
         return new ResponseEntity<>(toShow.getTasks(), HttpStatus.OK);
     }
 

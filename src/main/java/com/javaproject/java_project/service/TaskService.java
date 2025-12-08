@@ -1,9 +1,6 @@
 package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.*;
-import com.javaproject.java_project.repositories.CoursesRepository;
-import com.javaproject.java_project.repositories.UsersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -14,13 +11,9 @@ import java.util.ArrayList;
 @Service
 public class TaskService
 {
-    @Autowired
-    UsersRepository usersRepository;
-    CoursesRepository coursesRepository;
-
     // In memory list of tasks
     // Going to have courseID in the task
-    List<Task> tasks = new ArrayList<Task>();
+    private List<Task> tasks;
 
     private int nextID = 1; // autoincrement this for next tasks
 
@@ -37,21 +30,6 @@ public class TaskService
         this.skillProgressService = skillProgressService;
     }
 
-    public List<Task> getTasksForCourse(int courseId)
-    {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ArrayList<>();
-
-        List<Task> result = new ArrayList<>();
-        for (Task task : tasks)
-        {
-            if (task.getCourseID() == courseId)
-                result.add(task);
-        }
-        return result;
-    }
-
     public Task createTask(int courseId, String taskType, String title, String description, LocalDateTime deadline)
     {
         // create the task object using the model, PASS THE COURSE ID TOO!
@@ -62,66 +40,53 @@ public class TaskService
         if(currentUser == null)
             return null;
 
-        Task task;
+        Course currentCourse = courseService.getCourseByID(courseId);
 
-        switch(taskType.toUpperCase()) {
+        Task task = switch (taskType.toUpperCase()) {
+            case "ASSIGNMENT" -> AssignmentTask.builder()
+                    .taskID(nextID++)
+                    .courseID(courseId)
+                    .title(title)
+                    .description(description)
+                    .deadline(deadline)
+                    .completed(false)
+                    .build();
+            case "PROJECT" -> ProjectTask.builder()
+                    .taskID(nextID++)
+                    .courseID(courseId)
+                    .title(title)
+                    .description(description)
+                    .deadline(deadline)
+                    .completed(false)
+                    .build();
+            case "QUIZPREP" -> QuizPrepTask.builder()
+                    .taskID(nextID++)
+                    .courseID(courseId)
+                    .title(title)
+                    .description(description)
+                    .deadline(deadline)
+                    .completed(false)
+                    .build();
+            case "EXAMPREP" -> ExamPrepTask.builder()
+                    .taskID(nextID++)
+                    .courseID(courseId)
+                    .title(title)
+                    .description(description)
+                    .deadline(deadline)
+                    .completed(false)
+                    .build();
+            default -> Task.builder()
+                    .taskID(nextID++)
+                    .courseID(courseId)
+                    .title(title)
+                    .description(description)
+                    .deadline(deadline)
+                    .completed(false)
+                    .build();
+        };
 
-            case "ASSIGNMENT":
-                task = AssignmentTask.builder()
-                        .taskID(nextID++)
-                        .courseID(courseId)
-                        .title(title)
-                        .description(description)
-                        .deadline(deadline)
-                        .completed(false)
-                        .build();
-                break;
-
-            case "PROJECT":
-                task = ProjectTask.builder()
-                        .taskID(nextID++)
-                        .courseID(courseId)
-                        .title(title)
-                        .description(description)
-                        .deadline(deadline)
-                        .completed(false)
-                        .build();
-                break;
-
-            case "QUIZPREP":
-                task = QuizPrepTask.builder()
-                        .taskID(nextID++)
-                        .courseID(courseId)
-                        .title(title)
-                        .description(description)
-                        .deadline(deadline)
-                        .completed(false)
-                        .build();
-                break;
-
-            case "EXAMPREP":
-                task = ExamPrepTask.builder()
-                        .taskID(nextID++)
-                        .courseID(courseId)
-                        .title(title)
-                        .description(description)
-                        .deadline(deadline)
-                        .completed(false)
-                        .build();
-                break;
-
-            default:
-                task = Task.builder()
-                        .taskID(nextID++)
-                        .courseID(courseId)
-                        .title(title)
-                        .description(description)
-                        .deadline(deadline)
-                        .completed(false)
-                        .build();
-        }
         task.configureXp();
-        tasks.add(task);
+        currentCourse.getTasks().add(task);
         return task;
     }
 
@@ -155,6 +120,8 @@ public class TaskService
         if (currentUser == null)
             return null;
 
+        Course currentCourse = courseService.getCourseByID(courseID);
+
         Task taskToEdit = getTaskByID(taskID);
 
         // checking if the same courseID is used
@@ -181,6 +148,8 @@ public class TaskService
         if(currentUser == null)
             return false;
 
+        Course currentCourse = courseService.getCourseByID(courseID);
+
         Task taskToDelete = getTaskByID(taskID);
 
         // checking if the same courseID is used
@@ -195,10 +164,11 @@ public class TaskService
     {
         // check if taskID matches any of the task list IDs
         // if not, return NULL (task not found)
-        // add xp, level up etc etc etc
+        // add xp, level up etc. etc. etc.
         User currentUser = authService.getCurrentUser();
         if(currentUser == null)
             return false;
+
 
         if (courseService.getCourseByID(courseID) == null)
             return false;

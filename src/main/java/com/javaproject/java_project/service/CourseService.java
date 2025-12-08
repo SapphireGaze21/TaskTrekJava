@@ -2,21 +2,13 @@ package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
-import com.javaproject.java_project.repositories.CoursesRepository;
-import com.javaproject.java_project.repositories.UsersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Optional;
 
 @Service
 public class CourseService {
-
-    @Autowired
-    UsersRepository usersRepository;
-    CoursesRepository coursesRepository;
 
     private int nextID = 1; // autoincrement this for next courses
 
@@ -36,10 +28,7 @@ public class CourseService {
         if (currentUser == null)
             return new ArrayList<>();
 
-        int currentUserID = currentUser.getId();
-        Optional<User> temp_user = usersRepository.findById(currentUserID);
-
-        temp_user.ifPresent(user -> courses = user.getUserCourses());
+        courses = currentUser.getUserCourses();
 
         return courses;
     }
@@ -52,27 +41,20 @@ public class CourseService {
         if (currentUser == null)
             return null;
 
-        // check if name already exists in the courses, if so, return NULL (course name taken)
+        // check if name already exists in the courses for the user, if so, return NULL (course name taken)
         for(Course course : courses)
         {
-            if (courseName.equals(course.getCourseName()))
+            if (courseName.equals(course.getCourseName()) && course.getUserId() == currentUser.getId())
                 return null;
         }
 
         Course newcourse = Course.builder()
-                .courseId(nextID)
+                .courseId(nextID++)
+                .userId(currentUser.getId())
                 .courseName(courseName)
                 .build();
 
         courses.add(newcourse);
-
-        if (currentUser.getUserCourses() != null)
-        {
-            currentUser.getUserCourses().add(newcourse);
-            usersRepository.save(currentUser);
-        }
-
-        nextID++;
         return newcourse;
     }
 
@@ -84,6 +66,8 @@ public class CourseService {
         // no logged-in user
         if (currentUser == null)
             return null;
+
+        courses = currentUser.getUserCourses();
 
         for (Course course : courses)
         {
@@ -105,6 +89,8 @@ public class CourseService {
         if (currentUser == null)
             return null;
 
+        courses = currentUser.getUserCourses();
+
         for (Course course : courses)
         {
             // name clash
@@ -117,7 +103,6 @@ public class CourseService {
             return null;
 
         course.setCourseName(newCourseName);
-        usersRepository.save(currentUser);
 
         return course;
         // check if courseID matches any of the course list IDs
@@ -134,14 +119,13 @@ public class CourseService {
         if (authService.getCurrentUser() == null)
             return false;
 
+        courses = currentUser.getUserCourses();
+
         Course course = getCourseByID(courseID);
         if (course == null)
             return false;
 
-        courses.remove(course);
-
         currentUser.getUserCourses().remove(course);
-        usersRepository.save(currentUser);
         return true;
 
         // if not, return NULL (course not found)
