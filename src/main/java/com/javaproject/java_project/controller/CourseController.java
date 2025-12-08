@@ -3,8 +3,6 @@ package com.javaproject.java_project.controller;
 import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
 import com.javaproject.java_project.request.NewCourseRequest;
-import com.javaproject.java_project.repositories.UsersRepository;
-import com.javaproject.java_project.repositories.CoursesRepository;
 import com.javaproject.java_project.service.AuthService;
 import com.javaproject.java_project.service.CourseService;
 import org.springframework.http.HttpStatus;
