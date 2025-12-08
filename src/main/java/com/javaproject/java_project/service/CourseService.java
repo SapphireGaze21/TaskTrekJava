@@ -48,14 +48,14 @@ public class CourseService {
                 return null;
         }
 
-        Course newcourse = Course.builder()
+        Course newCourse = Course.builder()
                 .courseId(nextID++)
                 .userId(currentUser.getId())
                 .courseName(courseName)
                 .build();
 
-        courses.add(newcourse);
-        return newcourse;
+        courses.add(newCourse);
+        return newCourse;
     }
 
     // Tasks of a specific course

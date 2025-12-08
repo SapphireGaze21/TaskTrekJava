@@ -5,15 +5,10 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class TaskService
 {
-    // In memory list of tasks
-    // Going to have courseID in the task
-    List<Task> tasks;
-
     private int nextID = 1; // autoincrement this for next tasks
 
     // we use AuthService to know which user is currently logged in
@@ -89,7 +84,7 @@ public class TaskService
         return task;
     }
 
-    public Task getTaskByID(int taskID)
+    public Task getTaskByID(int courseID, int taskID)
     {
         User currentUser = authService.getCurrentUser();
 
@@ -97,10 +92,14 @@ public class TaskService
         if (currentUser == null)
             return null;
 
+        Course currentCourse = courseService.getCourseByID(courseID);
+        if (currentCourse == null)
+            return null;
+
         // check if taskID matches any of the tasks list IDs
         // if not, return null (task not found)
         // else, return the task
-        for (Task task : tasks)
+        for (Task task : currentCourse.getTasks())
         {
             if(task.getTaskID() == taskID)
                 return task;
@@ -119,7 +118,7 @@ public class TaskService
         if (currentUser == null)
             return null;
 
-        Task taskToEdit = getTaskByID(taskID);
+        Task taskToEdit = getTaskByID(courseID, taskID);
 
         // checking if the same courseID is used
         if (taskToEdit == null || courseID != taskToEdit.getCourseID())
@@ -145,13 +144,15 @@ public class TaskService
         if(currentUser == null)
             return false;
 
-        Task taskToDelete = getTaskByID(taskID);
+        Course currentCourse = courseService.getCourseByID(courseID);
+
+        Task taskToDelete = getTaskByID(courseID, taskID);
 
         // checking if the same courseID is used
         if (taskToDelete == null || courseID != taskToDelete.getCourseID())
             return false;
 
-        tasks.remove(taskToDelete);
+        currentCourse.getTasks().remove(taskToDelete);
         return true;
     }
 
@@ -164,11 +165,10 @@ public class TaskService
         if(currentUser == null)
             return false;
 
-
         if (courseService.getCourseByID(courseID) == null)
             return false;
 
-        Task task = getTaskByID(taskID);
+        Task task = getTaskByID(courseID, taskID);
         if (task == null)
             return false;
 
