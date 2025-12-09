@@ -4,6 +4,7 @@ import com.javaproject.java_project.model.*;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -165,6 +166,8 @@ public class TaskService
         if(currentUser == null)
             return false;
 
+        LocalDate today = LocalDate.now();
+
         if (courseService.getCourseByID(courseID) == null)
             return false;
 
@@ -186,8 +189,22 @@ public class TaskService
         if (LocalDateTime.now().isAfter(task.getDeadline()))
             task.setMultiplier(task.getMultiplier() / 2);
 
+
+        // new streak
+        if (currentUser.getLastTaskCompletedDate() == null)
+            currentUser.setStreak(1);
+
+        // the streak continues
+        else if (currentUser.getLastTaskCompletedDate() == LocalDate.now().minusDays(1))
+            currentUser.setStreak(currentUser.getStreak() + 1);
+
+        else
+            currentUser.setStreak(1);
+
+        currentUser.setLastTaskCompletedDate(LocalDate.now());
+
         // award XP based on task difficulty computed earlier
-        skillProgressService.awardTaskCompletionXp(courseName, task.getBaseXP(), task.getMultiplier());
+        skillProgressService.awardTaskCompletionXp(courseName, task.getBaseXP(), task.getMultiplier(), currentUser.getStreak());
 
         return true;
 

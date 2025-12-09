@@ -31,13 +31,18 @@ public class User{
 
     @Builder.Default
     private int level = 1;
+
     @Builder.Default
     private int xp=0;
 
     @Builder.Default
     private int streak=0;
+
     @Builder.Default
     private LocalDate lastActiveDate = LocalDate.now();
+
+    @Builder.Default
+    private LocalDate lastTaskCompletedDate = null;
 
     @Builder.Default
     List<Course> userCourses = new ArrayList<>();

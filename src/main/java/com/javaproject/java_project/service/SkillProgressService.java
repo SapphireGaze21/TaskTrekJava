@@ -394,43 +394,11 @@ public class SkillProgressService {
      * @param difficultyMultiplier Multiplier based on task difficulty (e.g., 1.0, 1.5, 2.0)
      * @return Map containing level up information
      */
-    public Map<String, Object> awardTaskCompletionXp(String courseName, int baseXp, double difficultyMultiplier) {
-        int finalXp = (int) Math.round(baseXp * difficultyMultiplier);
+    public Map<String, Object> awardTaskCompletionXp(String courseName, int baseXp, double difficultyMultiplier, int streak)
+    {
+        int extraXP = streak * 10; // streak bonus
+
+        int finalXp = (int) Math.round(baseXp * difficultyMultiplier) + extraXP;
         return addXpToCourse(courseName, finalXp);
     }
 }
-
-/*
- * INTEGRATION NOTES FOR OTHER SERVICES:
- *
- * 1. TaskService.completeTask() should call:
- *    skillProgressService.awardTaskCompletionXp(courseName, baseXp, difficultyMultiplier);
- *
- * 2. CourseService.createCourse() should call:
- *    skillProgressService.initializeSkillProgress(courseName);
- *
- * 3. CourseService.deleteCourse() should call:
- *    skillProgressService.removeSkillProgress(courseName);
- *
- * 4. AuthService.registerUser() BUG FIX NEEDED:
- *    Add: .id(nextID) before .build()
- *
- * Example integration in TaskService.completeTask():
- *
- * public boolean completeTask(int courseID, int taskID) {
- *     // Find task logic...
- *     if (task != null && !task.isCompleted()) {
- *         task.setCompleted(true);
- *
- *         // Award XP based on difficulty
- *         String courseName = courseService.getCourseByID(userID, courseID).getName();
- *         double multiplier = task.getDifficulty().equals("HARD") ? 2.0 :
- *                           task.getDifficulty().equals("MEDIUM") ? 1.5 : 1.0;
- *
- *         skillProgressService.awardTaskCompletionXp(courseName, 100, multiplier);
- *
- *         return true;
- *     }
- *     return false;
- * }
- */
