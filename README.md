@@ -59,6 +59,14 @@ src/
 
 │   └── Task.java
 
+│   └── QuizPrepTask.java
+
+│   └── ProjectTask.java
+
+│   └── ExamPrepTask.java
+
+│   └── AssignmentTask.java
+
 │   ├── Achievement.java
 
 │   ├── SkillProgress.java
@@ -73,37 +81,32 @@ src/
 
 │   └── NewCourseRequest.java
 
-## Current Features (as of 28/11/2025)
+│   └── NewTaskRequest.java
+
+│   └── EditedCourseRequest.java
+
+## Features
 
 - Auth system (register + login) tested on Postman
  
 - Course CRUD (create, rename, delete, view)
 
+- Task CRUD + Complete, with gamification through XP, levels, and day streaks
+
 - Controller–Service separation with in-memory storage
 
-- Auth state maintained through AuthService
+- Auth state maintained through AuthService. Passwords hashed using BCryptPasswordEncoder
 
 
-## API Endpoints Summary (currently implemented)
+## API Endpoints Summary
 
 | Method | Endpoint	| Description |
 | :---: | :---: | :---: |
 | POST | /auth/register	| Register a new user |
 | POST | /auth/login | Login existing user |
-| GET | /courses | List all user courses |
-| POST | /courses | Create a new course |
-| PUT | /courses/{courseId}	| Rename a course |
-| DELETE | /courses/{courseId} | Delete a course |
-| GET | /courses/{id} | View tasks under a course |
-
-## Remaining Features
-
-- Task Service partially implemented (logic pending), along with SkillProgress and Achievements
-
-- Task Type implementations via inheritance pending
-
-- MongoDB integration pending
-
-- JWT token authentication (substituted with an injected AuthService object, for now)
-
-- Final end-to-end Postman testing
+| GET | /api/courses | Show all courses of the logged-in user |
+| GET | /api/courses/{id} | Shows all tasks w.r.t a course |
+| POST | /api/courses/{id} | Create a task |
+| PATCH | /api/courses/{courseid}/tasks/{taskid} | Edit details of a task |
+| DELETE | /api/courses/{courseid}/tasks/{taskid} | Delete a task |
+| POST | /api/courses/{courseid}/tasks/{taskid}/complete | Mark a task as complete and award XP |
