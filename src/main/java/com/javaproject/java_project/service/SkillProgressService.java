@@ -12,7 +12,7 @@ import java.util.Map;
 public class SkillProgressService {
 
     @Autowired
-    private AuthService authService;
+    AuthService authService;
 
     // Level names with academic/achievement theme
     private static final String[] LEVEL_NAMES = {

@@ -13,7 +13,7 @@ public class TaskService
     private int nextID = 1; // autoincrement this for next tasks
 
     // we use AuthService to know which user is currently logged in
-    private final AuthService authService;
+    final AuthService authService;
     private final CourseService courseService;
     private final SkillProgressService skillProgressService;
 
@@ -82,6 +82,7 @@ public class TaskService
 
         task.configureXp();
         currentCourse.getTasks().add(task);
+        authService.saveUsers();
         return task;
     }
 
@@ -132,6 +133,7 @@ public class TaskService
         if (newDeadline != null)
             taskToEdit.setDeadline(newDeadline);
 
+        authService.saveUsers();
         return taskToEdit;
     }
 
@@ -154,6 +156,7 @@ public class TaskService
             return false;
 
         currentCourse.getTasks().remove(taskToDelete);
+        authService.saveUsers();
         return true;
     }
 
@@ -205,6 +208,7 @@ public class TaskService
 
         // award XP based on task difficulty computed earlier
         skillProgressService.awardTaskCompletionXp(courseName, task.getBaseXP(), task.getMultiplier(), currentUser.getStreak());
+        authService.saveUsers();
 
         return true;
 

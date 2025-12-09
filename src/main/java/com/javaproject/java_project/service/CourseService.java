@@ -55,6 +55,8 @@ public class CourseService {
                 .build();
 
         courses.add(newCourse);
+        authService.saveUsers();
+
         return newCourse;
     }
 
@@ -103,6 +105,7 @@ public class CourseService {
             return null;
 
         course.setCourseName(newCourseName);
+        authService.saveUsers();
 
         return course;
         // check if courseID matches any of the course list IDs
@@ -126,6 +129,7 @@ public class CourseService {
             return false;
 
         currentUser.getUserCourses().remove(course);
+        authService.saveUsers();
         return true;
 
         // if not, return NULL (course not found)
