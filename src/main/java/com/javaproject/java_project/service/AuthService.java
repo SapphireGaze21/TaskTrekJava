@@ -3,6 +3,7 @@ package com.javaproject.java_project.service;
 import com.javaproject.java_project.model.User;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,9 @@ public class AuthService
 {
     // In memory Database for now, Mongo later
     private final List<User> users = new ArrayList<>();
-    private int nextID = 1; // autoincrement this for registering users
+    private int nextID = 1; // autoincrement this for registering user
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(16);
 
     // helper so other services can know who is logged in
     // currently logged-in user (set on successful login)
@@ -33,7 +36,7 @@ public class AuthService
         User newUser = User.builder()
                 .id(nextID)
                 .username(username)
-                .passwordHash(password)
+                .passwordHash(passwordEncoder.encode(password))
                 .build();
         nextID++;
 
@@ -62,7 +65,8 @@ public class AuthService
             return null;
         }
 
-        if (user.getPasswordHash().equals(password))
+
+        if (passwordEncoder.matches(password, user.getPasswordHash()))
         {
             currentUser = user; // Set logged-in user
             return user;
