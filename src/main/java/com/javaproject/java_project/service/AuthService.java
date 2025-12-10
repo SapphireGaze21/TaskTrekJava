@@ -108,7 +108,7 @@ public class AuthService
 
         users.add(newUser);
         saveUsers();
-        nextID++;
+
         return newUser;
     }
     // check if username already exists, if so, return null (username taken)
