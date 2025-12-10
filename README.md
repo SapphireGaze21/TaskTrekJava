@@ -2,7 +2,7 @@
 
 ## Overview
 
-A gamified task manager inspired by Google Tasks & Duolingo, where users manage courses and tasks — earning XP and levels as they complete them.
+A gamified productivity tracker for students inspired by Google Tasks & Duolingo, with course and task management — gamified with XP and levels.
 Built with Spring Boot in Java.
 
 Users can:-
@@ -11,9 +11,7 @@ Users can:-
 
 - Create and manage courses (via /courses)
 
-- Add and complete tasks (via /tasks)
-
-- Track XP and levels (future addition: /skills)
+- Add and complete tasks (via /tasks), earning XP and levelling up
 
 ## Tech Stack
 
@@ -21,7 +19,7 @@ Users can:-
 
 - Framework: Spring Boot
 
-- Database: MongoDB (to be integrated)
+- Database: JSON
 
 - Tools: Maven, Postman
 
@@ -31,9 +29,9 @@ src/
 
 ├── controller/
 
-│   ├── AuthController.java
+│   └── AuthController.java
 
-│   ├── CourseController.java
+│   └── CourseController.java
 
 │   └── TaskController.java
 
@@ -43,9 +41,9 @@ src/
 
 │   ├── AuthService.java
 
-│   ├── CourseService.java
+│   └── CourseService.java
 
-│   ├── TaskService.java
+│   └── TaskService.java
 
 │   └── SkillProgressService.java
 
@@ -53,9 +51,9 @@ src/
 
 ├── model/
 
-│   ├── User.java
+│   └── User.java
 
-│   ├── Course.java
+│   └── Course.java
 
 │   └── Task.java
 
@@ -67,17 +65,17 @@ src/
 
 │   └── AssignmentTask.java
 
-│   ├── Achievement.java
+│   └── Achievement.java
 
-│   ├── SkillProgress.java
+│   └── SkillProgress.java
 
 │
 
 └── request/
 
-│   ├── LoginRequest.java
+│   └── LoginRequest.java
 
-│   ├── SignupRequest.java
+│   └── SignupRequest.java
 
 │   └── NewCourseRequest.java
 
@@ -85,17 +83,17 @@ src/
 
 │   └── EditedCourseRequest.java
 
+└── users.json
+
 ## Features
 
-- Auth system (register + login) tested on Postman
+- Auth system (register + login) with state maintained and Passwords hashed using BCryptPasswordEncoder
  
 - Course CRUD (create, rename, delete, view)
 
 - Task CRUD + Complete, with gamification through XP, levels, and day streaks
 
-- Controller–Service separation with in-memory storage
-
-- Auth state maintained through AuthService. Passwords hashed using BCryptPasswordEncoder
+- Controller–Service separation with storage through JSON
 
 
 ## API Endpoints Summary
@@ -105,8 +103,11 @@ src/
 | POST | /auth/register	| Register a new user |
 | POST | /auth/login | Login existing user |
 | GET | /api/courses | Show all courses of the logged-in user |
-| GET | /api/courses/{id} | Shows all tasks w.r.t a course |
-| POST | /api/courses/{id} | Create a task |
+| POST | /api/courses | Create a new course under the user |
+| PUT | /api/courses/{id} | Rename course of ID in path |
+| DELETE | /api/courses/{id} | Delete course of ID in path |
+| GET | /api/courses/{id} | Shows all tasks of a course |
+| POST | /api/courses/{id}/tasks | Create a task |
 | PATCH | /api/courses/{courseid}/tasks/{taskid} | Edit details of a task |
 | DELETE | /api/courses/{courseid}/tasks/{taskid} | Delete a task |
 | POST | /api/courses/{courseid}/tasks/{taskid}/complete | Mark a task as complete and award XP |
