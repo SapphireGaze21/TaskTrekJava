@@ -2,7 +2,7 @@
 
 ## Overview
 
-A gamified productivity tracker for students inspired by Google Tasks & Duolingo, with course and task management — gamified with XP and levels.
+A productivity tracker for students inspired by Google Tasks & Duolingo, with course and task management — gamified with XP and levels.
 Built with Spring Boot in Java.
 
 Users can:-
