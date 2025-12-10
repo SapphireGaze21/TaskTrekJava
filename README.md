@@ -111,3 +111,22 @@ src/
 | PATCH | /api/courses/{courseid}/tasks/{taskid} | Edit details of a task |
 | DELETE | /api/courses/{courseid}/tasks/{taskid} | Delete a task |
 | POST | /api/courses/{courseid}/tasks/{taskid}/complete | Mark a task as complete and award XP |
+
+
+## Postman Collection
+
+To use the Demo Collection:-
+1. Open Postman.
+2. Click **Import**.
+3. Select the JSON file from the `postman/` folder.
+4. Make sure the backend is running on `http://localhost:8080`.
+5. Run the requests in this order:
+   - `POST /auth/register`
+   - `POST /auth/login`
+   - `GET /courses`
+   - `POST /courses`
+   - `PUT /courses/{courseId}`
+   - `GET /courses/{courseId}`
+   - `POST /courses/{courseId}/tasks`
+   - `PATCH /courses/{courseId}/tasks/{taskId}`
+   - `POST /courses/{courseId}/tasks/{taskId}/complete`
