@@ -28,59 +28,32 @@ Users can:-
 src/
 
 ├── controller/
-
 │   └── AuthController.java
-
 │   └── CourseController.java
-
 │   └── TaskController.java
 
-│
-
 ├── service/
-
 │   ├── AuthService.java
-
 │   └── CourseService.java
-
 │   └── TaskService.java
-
 │   └── SkillProgressService.java
 
-│
-
 ├── model/
-
 │   └── User.java
-
 │   └── Course.java
-
 │   └── Task.java
-
 │   └── QuizPrepTask.java
-
 │   └── ProjectTask.java
-
 │   └── ExamPrepTask.java
-
 │   └── AssignmentTask.java
-
 │   └── Achievement.java
-
 │   └── SkillProgress.java
 
-│
-
 └── request/
-
 │   └── LoginRequest.java
-
 │   └── SignupRequest.java
-
 │   └── NewCourseRequest.java
-
 │   └── NewTaskRequest.java
-
 │   └── EditedCourseRequest.java
 
 └── users.json
