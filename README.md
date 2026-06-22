@@ -25,38 +25,65 @@ Users can:-
 
 ## Project Structure (as of date)
 
-src/
+ src/
 
-├── controller/
-│   └── AuthController.java
-│   └── CourseController.java
-│   └── TaskController.java
+ ├── controller/
 
-├── service/
-│   ├── AuthService.java
-│   └── CourseService.java
-│   └── TaskService.java
-│   └── SkillProgressService.java
+ │   └── AuthController.java
 
-├── model/
-│   └── User.java
-│   └── Course.java
-│   └── Task.java
-│   └── QuizPrepTask.java
-│   └── ProjectTask.java
-│   └── ExamPrepTask.java
-│   └── AssignmentTask.java
-│   └── Achievement.java
-│   └── SkillProgress.java
+ │   └── CourseController.java
 
-└── request/
-│   └── LoginRequest.java
-│   └── SignupRequest.java
-│   └── NewCourseRequest.java
-│   └── NewTaskRequest.java
-│   └── EditedCourseRequest.java
+ │   └── TaskController.java
 
-└── users.json
+ │
+
+ ├── service/
+
+ │   ├── AuthService.java
+
+ │   └── CourseService.java
+
+ │   └── TaskService.java
+
+ │   └── SkillProgressService.java
+
+ │
+
+ ├── model/
+
+ │   └── User.java
+
+ │   └── Course.java
+
+ │   └── Task.java
+
+ │   └── QuizPrepTask.java
+
+ │   └── ProjectTask.java
+
+ │   └── ExamPrepTask.java
+
+ │   └── AssignmentTask.java
+
+ │   └── Achievement.java
+
+ │   └── SkillProgress.java
+
+ │
+
+ └── request/
+
+ │   └── LoginRequest.java
+
+ │   └── SignupRequest.java
+
+ │   └── NewCourseRequest.java
+
+ │   └── NewTaskRequest.java
+
+ │   └── EditedCourseRequest.java
+
+ └── users.json
 
 ## Features
 
