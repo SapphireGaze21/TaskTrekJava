@@ -168,8 +168,12 @@ public class SkillProgressService {
 
         return result;
     }
-
-    
+    /**
+     * Get details of progress within a course
+     * @param courseName Name of the course
+     * @return Map containing progress detail variables
+     */
+    public Map<String, Object> getCourseProgress(String courseName) {
         SkillProgress progress = getOrCreateSkillProgress(courseName);
 
         int totalXp = progress.getXp();
@@ -187,6 +191,40 @@ public class SkillProgressService {
         progressData.put("isMaxLevel", level >= 10);
 
         return progressData;
+    }
+
+    public int getXpInCurrentLevel(int totalXp) {
+        int level = calculateLevel(totalXp);
+        return totalXp - XP_THRESHOLDS[level - 1];
+    }
+
+    public int getXpToNextLevel(int totalXp) {
+        int level = calculateLevel(totalXp);
+        if (level >= 10) {
+            return 0;
+        }
+        return XP_THRESHOLDS[level] - totalXp;
+    }
+
+    public int getTotalXpForCurrentLevel(int totalXp) {
+        int level = calculateLevel(totalXp);
+        if (level >= 10) {
+            return 0;
+        }
+        return XP_THRESHOLDS[level] - XP_THRESHOLDS[level - 1];
+    }
+
+    public double getLevelProgressPercentage(int totalXp) {
+        int level = calculateLevel(totalXp);
+        if (level >= 10) {
+            return 100.0;
+        }
+        int xpInLevel = getXpInCurrentLevel(totalXp);
+        int totalXpInLevel = getTotalXpForCurrentLevel(totalXp);
+        if (totalXpInLevel == 0) {
+            return 0.0;
+        }
+        return Math.min(100.0, ((double) xpInLevel / totalXpInLevel) * 100.0);
     }
 
     /**
