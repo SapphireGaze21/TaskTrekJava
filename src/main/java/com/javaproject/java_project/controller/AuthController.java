@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import com.javaproject.java_project.security.JwtService;
+import java.util.Map;
+import java.util.HashMap;
 
 
 @RestController
@@ -17,10 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController 
 {
     private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public AuthController(AuthService authService)
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, JwtService jwtService)
     {
         this.authService = authService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
@@ -44,11 +54,23 @@ public class AuthController
     @PostMapping("/login")
     public ResponseEntity<?> login(@org.jetbrains.annotations.NotNull @RequestBody LoginRequest loginCreds)
     {
-        User loggedIn = authService.loginUser(loginCreds.getUsername(), loginCreds.getPassword());
-
-        if (loggedIn == null)
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginCreds.getUsername(), loginCreds.getPassword())
+            );
+            
+            User loggedIn = authService.getUserByUsername(loginCreds.getUsername());
+            authService.setCurrentUser(loggedIn);
+            
+            String token = jwtService.generateToken(loggedIn.getUsername());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("user", loggedIn);
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
-        else
-            return new ResponseEntity<>(loggedIn, HttpStatus.OK);
+        }
     }
 }

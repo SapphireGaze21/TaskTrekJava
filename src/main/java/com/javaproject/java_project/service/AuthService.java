@@ -4,7 +4,8 @@ import com.javaproject.java_project.model.User;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -26,12 +27,32 @@ public class AuthService
 
     private int nextID = 1; // autoincrement this for registering user
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(16);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    // helper so other services can know who is logged in
-    // currently logged-in user (set on successful login)
-    @Getter
     private User currentUser;
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+
+    public User getCurrentUser() {
+        org.springframework.security.core.Authentication authentication = 
+            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated() || 
+            authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+            return null;
+        }
+        
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
+            String username = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
+            return getUserByUsername(username);
+        }
+        
+        return null;
+    }
 
     // Runs on startup
     @PostConstruct
@@ -146,6 +167,15 @@ public class AuthService
             System.out.println("Incorrect password");
             return null;
         }
+    }
+
+    public User getUserByUsername(String username) {
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
     }
 
     // check if user exists in the list, if not just null
