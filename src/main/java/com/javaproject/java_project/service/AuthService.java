@@ -2,7 +2,6 @@ package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.User;
 import jakarta.annotation.PostConstruct;
-import lombok.Getter;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AuthService
@@ -30,12 +28,9 @@ public class AuthService
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private User currentUser;
-
-    public void setCurrentUser(User user) {
-        this.currentUser = user;
-    }
-
+    /**
+     * Resolves the user authenticated for the current request by JwtFilter.
+     */
     public User getCurrentUser() {
         org.springframework.security.core.Authentication authentication = 
             org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -45,13 +40,7 @@ public class AuthService
             return null;
         }
         
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-            String username = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-            return getUserByUsername(username);
-        }
-        
-        return null;
+        return getUserByUsername(authentication.getName());
     }
 
     // Runs on startup
@@ -159,7 +148,6 @@ public class AuthService
 
         if (passwordEncoder.matches(password, user.getPasswordHash()))
         {
-            currentUser = user; // Set logged-in user
             return user;
         }
         else

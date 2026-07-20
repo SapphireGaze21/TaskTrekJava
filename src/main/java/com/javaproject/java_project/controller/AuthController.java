@@ -59,8 +59,7 @@ public class AuthController
                 new UsernamePasswordAuthenticationToken(loginCreds.getUsername(), loginCreds.getPassword())
             );
             
-            User loggedIn = authService.getUserByUsername(loginCreds.getUsername());
-            authService.setCurrentUser(loggedIn);
+            User loggedIn = authService.getUserByUsername(authentication.getName());
             
             String token = jwtService.generateToken(loggedIn.getUsername());
             

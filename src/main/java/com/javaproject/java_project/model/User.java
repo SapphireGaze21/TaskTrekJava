@@ -1,6 +1,5 @@
 package com.javaproject.java_project.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
