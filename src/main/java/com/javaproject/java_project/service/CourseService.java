@@ -15,8 +15,6 @@ public class CourseService {
     // we use AuthService to know which user is currently logged in
     private final AuthService authService;
 
-    List<Course> courses;
-
     public CourseService(AuthService authService)
     {
         this.authService = authService; // @Autowired will inject the same instance from before
@@ -28,9 +26,7 @@ public class CourseService {
         if (currentUser == null)
             return new ArrayList<>();
 
-        courses = currentUser.getUserCourses();
-
-        return courses;
+        return currentUser.getUserCourses();
     }
 
     public Course createCourse(String courseName)
@@ -40,6 +36,8 @@ public class CourseService {
         // no logged-in user
         if (currentUser == null)
             return null;
+
+        List<Course> courses = currentUser.getUserCourses();
 
         // check if name already exists in the courses for the user, if so, return NULL (course name taken)
         for(Course course : courses)
@@ -69,7 +67,7 @@ public class CourseService {
         if (currentUser == null)
             return null;
 
-        courses = currentUser.getUserCourses();
+        List<Course> courses = currentUser.getUserCourses();
 
         for (Course course : courses)
         {
@@ -91,7 +89,7 @@ public class CourseService {
         if (currentUser == null)
             return null;
 
-        courses = currentUser.getUserCourses();
+        List<Course> courses = currentUser.getUserCourses();
 
         for (Course course : courses)
         {
@@ -121,8 +119,6 @@ public class CourseService {
         // no logged-in user
         if (authService.getCurrentUser() == null)
             return false;
-
-        courses = currentUser.getUserCourses();
 
         Course course = getCourseByID(courseID);
         if (course == null)

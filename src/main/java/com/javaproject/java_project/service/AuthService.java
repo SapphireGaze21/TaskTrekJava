@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 public class AuthService
 {
-    // In memory Database for now, Mongo later
+    // JSON-backed in-memory user store
     private final List<User> users = new ArrayList<>();
 
     private final ObjectMapper objectMapper = new ObjectMapper();

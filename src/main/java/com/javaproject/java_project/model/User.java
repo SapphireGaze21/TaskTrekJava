@@ -2,9 +2,6 @@ package com.javaproject.java_project.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -17,13 +14,10 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @Component
-@Document(collection = "users")
 public class User{
 
-    @Id
     private int id;
 
-    @Indexed(unique = true)
     private String username;
 
     private String passwordHash;
