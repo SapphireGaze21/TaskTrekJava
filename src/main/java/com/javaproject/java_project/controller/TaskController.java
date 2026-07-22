@@ -38,7 +38,7 @@ public class TaskController
     */
 
     @PostMapping
-    public ResponseEntity<?> createTask(@PathVariable int courseID, @RequestBody NewTaskRequest newTaskDetails)
+    public ResponseEntity<?> createTask(@PathVariable Long courseID, @RequestBody NewTaskRequest newTaskDetails)
     {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
@@ -64,7 +64,7 @@ public class TaskController
 
     // editing only what's been changed - PATCH
     @PatchMapping("/{taskId}")
-    public ResponseEntity<?> editTask(@PathVariable int courseID, @PathVariable int taskId, @RequestBody EditedTaskRequest editedTaskDetails)
+    public ResponseEntity<?> editTask(@PathVariable Long courseID, @PathVariable Long taskId, @RequestBody EditedTaskRequest editedTaskDetails)
     {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
@@ -89,7 +89,7 @@ public class TaskController
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<?> deleteTask(@PathVariable int courseID, @PathVariable int taskId)
+    public ResponseEntity<?> deleteTask(@PathVariable Long courseID, @PathVariable Long taskId)
     {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
@@ -103,7 +103,7 @@ public class TaskController
     }
 
     @PostMapping("/{taskId}/complete")
-    public ResponseEntity<?> completeTask(@PathVariable int courseID, @PathVariable int taskId)
+    public ResponseEntity<?> completeTask(@PathVariable Long courseID, @PathVariable Long taskId)
     {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)

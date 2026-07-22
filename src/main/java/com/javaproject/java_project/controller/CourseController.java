@@ -33,7 +33,7 @@ public class CourseController {
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<?> taskList(@PathVariable int courseId) {
+    public ResponseEntity<?> taskList(@PathVariable Long courseId) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
@@ -64,7 +64,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{courseId}")
-    public ResponseEntity<?> removeCourse(@PathVariable int courseId) {
+    public ResponseEntity<?> removeCourse(@PathVariable Long courseId) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
@@ -78,7 +78,7 @@ public class CourseController {
     }
 
     @PutMapping("/{courseId}")
-    public ResponseEntity<?> renameCourse(@PathVariable int courseId, @org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails) {
+    public ResponseEntity<?> renameCourse(@PathVariable Long courseId, @org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null)
             return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);

@@ -8,11 +8,16 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.javaproject.java_project.repository.SkillProgressRepository;
+
 @Service
 public class SkillProgressService {
 
     @Autowired
     AuthService authService;
+
+    @Autowired
+    private SkillProgressRepository skillProgressRepository;
 
     // Level names with academic/achievement theme
     private static final String[] LEVEL_NAMES = {
@@ -75,11 +80,13 @@ public class SkillProgressService {
     /**
      * Initialize skill progress for a new course
      * @param courseName Name of the course
+     * @param user Owner user
      * @return New SkillProgress object
      */
-    public SkillProgress initializeSkillProgress(String courseName) {
+    public SkillProgress initializeSkillProgress(String courseName, User user) {
         return SkillProgress.builder()
                 .courseName(courseName)
+                .user(user)
                 .build();
     }
 
@@ -99,7 +106,8 @@ public class SkillProgressService {
 
         // If course doesn't exist in map, create it
         if (!skillProgressMap.containsKey(courseName)) {
-            SkillProgress newProgress = initializeSkillProgress(courseName);
+            SkillProgress newProgress = initializeSkillProgress(courseName, currentUser);
+            newProgress = skillProgressRepository.save(newProgress);
             skillProgressMap.put(courseName, newProgress);
         }
 
@@ -165,6 +173,8 @@ public class SkillProgressService {
                 "leveledUp", userLevel > oldUserLevel,
                 "levelsGained", userLevel - oldUserLevel
         ));
+
+        authService.saveUsers();
 
         return result;
     }

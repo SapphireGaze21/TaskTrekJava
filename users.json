@@ -1,1 +1,14 @@
-[ ]
+[ {
+  "id" : 1,
+  "username" : "test1",
+  "passwordHash" : "$2a$10$C4utOCN8ynL.Rf5mjybnmOmKtVx1cEjUhA9FyXExRK03Bs0xtEFxm",
+  "level" : 1,
+  "xp" : 0,
+  "streak" : 0,
+  "lastActiveDate" : "2026-07-19",
+  "lastTaskCompletedDate" : null,
+  "userCourses" : [ ],
+  "achievements" : [ ],
+  "inventory" : [ ],
+  "skillProgress" : { }
+} ]

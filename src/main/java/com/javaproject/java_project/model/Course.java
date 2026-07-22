@@ -1,6 +1,7 @@
 package com.javaproject.java_project.model;
 
 import lombok.*;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +11,22 @@ import java.util.List;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "courses")
+public class Course {
 
-public class Course
-{
-    private int courseId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long courseId;
+
     private String courseName;
-    private int userId; // owner
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Task> tasks = new ArrayList<>(); // stored by IDs
+    private List<Task> tasks = new ArrayList<>();
 }

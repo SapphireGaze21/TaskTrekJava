@@ -1,6 +1,7 @@
 package com.javaproject.java_project.model;
 
 import lombok.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Getter
@@ -9,9 +10,18 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Data
+@Entity
+@Table(name = "achievements")
 public class Achievement {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private String title;
     private String description;
 

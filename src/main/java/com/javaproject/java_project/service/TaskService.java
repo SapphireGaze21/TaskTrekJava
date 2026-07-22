@@ -1,8 +1,8 @@
 package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.*;
+import com.javaproject.java_project.repository.TaskRepository;
 import org.springframework.stereotype.Service;
-
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,69 +10,61 @@ import java.time.LocalDateTime;
 @Service
 public class TaskService
 {
-    private int nextID = 1; // autoincrement this for next tasks
-
-    // we use AuthService to know which user is currently logged in
-    final AuthService authService;
+    private final AuthService authService;
     private final CourseService courseService;
     private final SkillProgressService skillProgressService;
+    private final TaskRepository taskRepository;
 
-
-    public TaskService(AuthService authService, CourseService courseService, SkillProgressService skillProgressService)
+    public TaskService(AuthService authService, CourseService courseService, 
+                       SkillProgressService skillProgressService, TaskRepository taskRepository)
     {
         this.authService = authService;
         this.courseService = courseService;
         this.skillProgressService = skillProgressService;
+        this.taskRepository = taskRepository;
     }
 
-    public Task createTask(int courseId, String taskType, String title, String description, LocalDateTime deadline)
+    public Task createTask(Long courseId, String taskType, String title, String description, LocalDateTime deadline)
     {
-        // create the task object using the model, PASS THE COURSE ID TOO!
-        // push to array and return the task
-
         User currentUser = authService.getCurrentUser();
-
         if(currentUser == null)
             return null;
 
         Course currentCourse = courseService.getCourseByID(courseId);
+        if (currentCourse == null)
+            return null;
 
         Task task = switch (taskType.toUpperCase()) {
             case "ASSIGNMENT" -> AssignmentTask.builder()
-                    .taskID(nextID++)
-                    .courseID(courseId)
+                    .course(currentCourse)
                     .title(title)
                     .description(description)
                     .deadline(deadline)
                     .completed(false)
                     .build();
             case "PROJECT" -> ProjectTask.builder()
-                    .taskID(nextID++)
-                    .courseID(courseId)
+                    .course(currentCourse)
                     .title(title)
                     .description(description)
                     .deadline(deadline)
                     .completed(false)
                     .build();
             case "QUIZPREP" -> QuizPrepTask.builder()
-                    .taskID(nextID++)
-                    .courseID(courseId)
+                    .course(currentCourse)
                     .title(title)
                     .description(description)
                     .deadline(deadline)
                     .completed(false)
                     .build();
             case "EXAMPREP" -> ExamPrepTask.builder()
-                    .taskID(nextID++)
-                    .courseID(courseId)
+                    .course(currentCourse)
                     .title(title)
                     .description(description)
                     .deadline(deadline)
                     .completed(false)
                     .build();
             default -> Task.builder()
-                    .taskID(nextID++)
-                    .courseID(courseId)
+                    .course(currentCourse)
                     .title(title)
                     .description(description)
                     .deadline(deadline)
@@ -81,16 +73,12 @@ public class TaskService
         };
 
         task.configureXp();
-        currentCourse.getTasks().add(task);
-        authService.saveUsers();
-        return task;
+        return taskRepository.save(task);
     }
 
-    public Task getTaskByID(int courseID, int taskID)
+    public Task getTaskByID(Long courseID, Long taskID)
     {
         User currentUser = authService.getCurrentUser();
-
-        // no logged-in user
         if (currentUser == null)
             return null;
 
@@ -98,32 +86,17 @@ public class TaskService
         if (currentCourse == null)
             return null;
 
-        // check if taskID matches any of the tasks list IDs
-        // if not, return null (task not found)
-        // else, return the task
-        for (Task task : currentCourse.getTasks())
-        {
-            if(task.getTaskID() == taskID)
-                return task;
-        }
-        return null;
+        return taskRepository.findByTaskIDAndCourse(taskID, currentCourse).orElse(null);
     }
 
-    public Task editTask(int courseID, int taskID, String newTitle, String newDesc, LocalDateTime newDeadline)
+    public Task editTask(Long courseID, Long taskID, String newTitle, String newDesc, LocalDateTime newDeadline)
     {
-        // check if taskID matches any of the taskToEdit list IDs
-        // if not, return NULL (taskToEdit not found)
-        // Else, edit the taskToEdit
-        // return the taskToEdit
         User currentUser = authService.getCurrentUser();
-
         if (currentUser == null)
             return null;
 
         Task taskToEdit = getTaskByID(courseID, taskID);
-
-        // checking if the same courseID is used
-        if (taskToEdit == null || courseID != taskToEdit.getCourseID())
+        if (taskToEdit == null)
             return null;
 
         if (newTitle != null)
@@ -133,84 +106,62 @@ public class TaskService
         if (newDeadline != null)
             taskToEdit.setDeadline(newDeadline);
 
-        authService.saveUsers();
-        return taskToEdit;
+        return taskRepository.save(taskToEdit);
     }
 
-    public boolean deleteTask(int courseID, int taskID)
+    public boolean deleteTask(Long courseID, Long taskID)
     {
-        // check if taskID matches any of the taskToDelete list IDs
-        // if not, return NULL (taskToDelete not found)
-        // Else, delete from the taskToDelete array
-        // True if deleted
         User currentUser = authService.getCurrentUser();
         if(currentUser == null)
             return false;
 
-        Course currentCourse = courseService.getCourseByID(courseID);
-
         Task taskToDelete = getTaskByID(courseID, taskID);
-
-        // checking if the same courseID is used
-        if (taskToDelete == null || courseID != taskToDelete.getCourseID())
+        if (taskToDelete == null)
             return false;
 
-        currentCourse.getTasks().remove(taskToDelete);
-        authService.saveUsers();
+        taskRepository.delete(taskToDelete);
         return true;
     }
 
-    public boolean completeTask(int courseID, int taskID)
+    public boolean completeTask(Long courseID, Long taskID)
     {
-        // check if taskID matches any of the task list IDs
-        // if not, return NULL (task not found)
-        // add xp, level up etc. etc. etc.
         User currentUser = authService.getCurrentUser();
         if(currentUser == null)
             return false;
 
-        LocalDate today = LocalDate.now();
-
-        if (courseService.getCourseByID(courseID) == null)
+        Course course = courseService.getCourseByID(courseID);
+        if (course == null)
             return false;
 
         Task task = getTaskByID(courseID, taskID);
-        if (task == null)
-            return false;
-
-        // already finished
-        if (task.isCompleted())
+        if (task == null || task.isCompleted())
             return false;
 
         task.setCompleted(true);
 
-        // get course name for XP mapping
-        Course course = courseService.getCourseByID(courseID);
         String courseName = course.getCourseName();
 
         // Penalty of 0.5x if the task is done late
         if (LocalDateTime.now().isAfter(task.getDeadline()))
             task.setMultiplier(task.getMultiplier() / 2);
 
-
         // new streak
         if (currentUser.getLastTaskCompletedDate() == null)
             currentUser.setStreak(1);
-
         // the streak continues
-        else if (currentUser.getLastTaskCompletedDate() == LocalDate.now().minusDays(1))
+        else if (currentUser.getLastTaskCompletedDate().equals(LocalDate.now().minusDays(1)))
             currentUser.setStreak(currentUser.getStreak() + 1);
-
-        else
+        else if (!currentUser.getLastTaskCompletedDate().equals(LocalDate.now()))
             currentUser.setStreak(1);
 
         currentUser.setLastTaskCompletedDate(LocalDate.now());
+
+        taskRepository.save(task);
 
         // award XP based on task difficulty computed earlier
         skillProgressService.awardTaskCompletionXp(courseName, task.getBaseXP(), task.getMultiplier(), currentUser.getStreak());
         authService.saveUsers();
 
         return true;
-
     }
 }

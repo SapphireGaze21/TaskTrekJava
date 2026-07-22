@@ -2,6 +2,7 @@ package com.javaproject.java_project.service;
 
 import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.User;
+import com.javaproject.java_project.repository.CourseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,14 +11,13 @@ import java.util.ArrayList;
 @Service
 public class CourseService {
 
-    private int nextID = 1; // autoincrement this for next courses
-
-    // we use AuthService to know which user is currently logged in
     private final AuthService authService;
+    private final CourseRepository courseRepository;
 
-    public CourseService(AuthService authService)
+    public CourseService(AuthService authService, CourseRepository courseRepository)
     {
-        this.authService = authService; // @Autowired will inject the same instance from before
+        this.authService = authService;
+        this.courseRepository = courseRepository;
     }
 
     public List<Course> getCourses()
@@ -26,7 +26,7 @@ public class CourseService {
         if (currentUser == null)
             return new ArrayList<>();
 
-        return currentUser.getUserCourses();
+        return courseRepository.findByUser(currentUser);
     }
 
     public Course createCourse(String courseName)
@@ -37,29 +37,25 @@ public class CourseService {
         if (currentUser == null)
             return null;
 
-        List<Course> courses = currentUser.getUserCourses();
+        List<Course> courses = courseRepository.findByUser(currentUser);
 
         // check if name already exists in the courses for the user, if so, return NULL (course name taken)
         for(Course course : courses)
         {
-            if (courseName.equals(course.getCourseName()) && course.getUserId() == currentUser.getId())
+            if (courseName.equals(course.getCourseName()))
                 return null;
         }
 
         Course newCourse = Course.builder()
-                .courseId(nextID++)
-                .userId(currentUser.getId())
+                .user(currentUser)
                 .courseName(courseName)
                 .build();
 
-        courses.add(newCourse);
-        authService.saveUsers();
-
-        return newCourse;
+        return courseRepository.save(newCourse);
     }
 
     // Tasks of a specific course
-    public Course getCourseByID(int courseID)
+    public Course getCourseByID(Long courseID)
     {
         User currentUser = authService.getCurrentUser();
 
@@ -67,21 +63,10 @@ public class CourseService {
         if (currentUser == null)
             return null;
 
-        List<Course> courses = currentUser.getUserCourses();
-
-        for (Course course : courses)
-        {
-            if (course.getCourseId() == courseID)
-                return course;
-        }
-
-        return null;
-        // check if courseID matches any of the course list IDs (userIDs should match too)
-        // if not, return null (course not found)
-        // else, return the course
+        return courseRepository.findByCourseIdAndUser(courseID, currentUser).orElse(null);
     }
 
-    public Course renameCourse(int courseID, String newCourseName)
+    public Course renameCourse(Long courseID, String newCourseName)
     {
         User currentUser = authService.getCurrentUser();
 
@@ -89,12 +74,12 @@ public class CourseService {
         if (currentUser == null)
             return null;
 
-        List<Course> courses = currentUser.getUserCourses();
+        List<Course> courses = courseRepository.findByUser(currentUser);
 
         for (Course course : courses)
         {
             // name clash
-            if (course.getCourseId() != courseID && course.getCourseName().equals(newCourseName))
+            if (!course.getCourseId().equals(courseID) && course.getCourseName().equals(newCourseName))
                 return null;
         }
 
@@ -103,33 +88,22 @@ public class CourseService {
             return null;
 
         course.setCourseName(newCourseName);
-        authService.saveUsers();
-
-        return course;
-        // check if courseID matches any of the course list IDs
-        // if not, return NULL (course not found)
-        // Else, rename the course
-        // return the course
+        return courseRepository.save(course);
     }
 
-    public boolean deleteCourse(int courseID)
+    public boolean deleteCourse(Long courseID)
     {
         User currentUser = authService.getCurrentUser();
 
         // no logged-in user
-        if (authService.getCurrentUser() == null)
+        if (currentUser == null)
             return false;
 
         Course course = getCourseByID(courseID);
         if (course == null)
             return false;
 
-        currentUser.getUserCourses().remove(course);
-        authService.saveUsers();
+        courseRepository.delete(course);
         return true;
-
-        // if not, return NULL (course not found)
-        // Else, delete from the courses array
-        // True if deleted
     }
 }

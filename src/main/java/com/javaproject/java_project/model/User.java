@@ -2,6 +2,7 @@ package com.javaproject.java_project.model;
 
 import lombok.*;
 import org.springframework.stereotype.Component;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -13,10 +14,15 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @Component
-public class User{
+@Entity
+@Table(name = "users")
+public class User {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(unique = true)
     private String username;
 
     private String passwordHash;
@@ -25,10 +31,10 @@ public class User{
     private int level = 1;
 
     @Builder.Default
-    private int xp=0;
+    private int xp = 0;
 
     @Builder.Default
-    private int streak=0;
+    private int streak = 0;
 
     @Builder.Default
     private LocalDate lastActiveDate = LocalDate.now();
@@ -36,16 +42,20 @@ public class User{
     @Builder.Default
     private LocalDate lastTaskCompletedDate = null;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    List<Course> userCourses = new ArrayList<>();
+    private List<Course> userCourses = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Achievement> achievements = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> inventory = new ArrayList<>(); // avatars/themes/boosters-LOGIC PENDING
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapKey(name = "courseName")
     @Builder.Default
     private Map<String, SkillProgress> skillProgress = new HashMap<>(); // courseName → SkillProgress
-
-    //have to decide method to decide the level for a course
 }
