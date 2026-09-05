@@ -34,7 +34,8 @@ public class TaskService
         if (currentCourse == null)
             return null;
 
-        Task task = switch (taskType.toUpperCase()) {
+        String normalizedTaskType = taskType == null ? "GENERAL" : taskType.trim().toUpperCase();
+        Task task = switch (normalizedTaskType) {
             case "ASSIGNMENT" -> AssignmentTask.builder()
                     .course(currentCourse)
                     .title(title)
@@ -142,7 +143,7 @@ public class TaskService
         String courseName = course.getCourseName();
 
         // Penalty of 0.5x if the task is done late
-        if (LocalDateTime.now().isAfter(task.getDeadline()))
+        if (task.getDeadline() != null && LocalDateTime.now().isAfter(task.getDeadline()))
             task.setMultiplier(task.getMultiplier() / 2);
 
         // new streak

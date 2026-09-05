@@ -36,3 +36,10 @@ build/
 ### Local study notes ###
 study.md
 interviewprep.md
+
+### Frontend ###
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/.env
+.runtime/

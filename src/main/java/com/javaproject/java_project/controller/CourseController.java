@@ -1,93 +1,75 @@
 package com.javaproject.java_project.controller;
 
+import com.javaproject.java_project.dto.CourseDetailResponse;
+import com.javaproject.java_project.dto.CourseResponse;
+import com.javaproject.java_project.dto.TaskResponse;
 import com.javaproject.java_project.model.Course;
-import com.javaproject.java_project.model.User;
 import com.javaproject.java_project.request.NewCourseRequest;
-import com.javaproject.java_project.service.AuthService;
 import com.javaproject.java_project.service.CourseService;
+import com.javaproject.java_project.service.SkillProgressService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/courses")
+@RequestMapping("/api/courses")
 public class CourseController {
-    private final AuthService authService;
     private final CourseService courseService;
+    private final SkillProgressService skillProgressService;
 
-    public CourseController(AuthService authService, CourseService courseService) {
-        this.authService = authService;
+    public CourseController(CourseService courseService, SkillProgressService skillProgressService) {
         this.courseService = courseService;
+        this.skillProgressService = skillProgressService;
     }
 
     @GetMapping
-    public ResponseEntity<?> dashBoard() {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        List<Course> courses = courseService.getCourses();
-        return new ResponseEntity<>(courses, HttpStatus.OK);
+    public List<CourseResponse> listCourses() {
+        return courseService.getCourses().stream().map(CourseResponse::from).toList();
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<?> taskList(@PathVariable Long courseId) {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        Course toShow = courseService.getCourseByID(courseId);
-        if (toShow == null)
-            return new ResponseEntity<>("Course Not Found", HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity<>(toShow.getTasks(), HttpStatus.OK);
+    public ResponseEntity<?> getCourse(@PathVariable Long courseId) {
+        Course course = courseService.getCourseByID(courseId);
+        if (course == null) return notFound("Course not found.");
+        List<TaskResponse> tasks = course.getTasks().stream().map(TaskResponse::from).toList();
+        return ResponseEntity.ok(new CourseDetailResponse(course.getCourseId(), course.getCourseName(), tasks,
+                skillProgressService.getCourseProgress(course.getCourseName())));
     }
 
     @PostMapping
-    public ResponseEntity<?> createCourse(@org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails) {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        // trim will take care of strings with just spaces (they are empty)
-        if (newCourseDetails.getCourseName() == null || newCourseDetails.getCourseName().trim().isEmpty())
-            return new ResponseEntity<>("Course Name cannot be empty", HttpStatus.BAD_REQUEST);
-
-        Course created = courseService.createCourse(newCourseDetails.getCourseName());
-
-        if (created == null)
-            return new ResponseEntity<>("Course Name already exists.", HttpStatus.CONFLICT);
-        else
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/{courseId}")
-    public ResponseEntity<?> removeCourse(@PathVariable Long courseId) {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        boolean deleted = courseService.deleteCourse(courseId);
-
-        if (!deleted)
-            return new ResponseEntity<>("Course does not Exist.", HttpStatus.NOT_FOUND);
-        else
-            return new ResponseEntity<>("Course deleted", HttpStatus.NO_CONTENT); // fetch the course name
+    public ResponseEntity<?> createCourse(@RequestBody NewCourseRequest request) {
+        if (isBlank(request.getCourseName())) return ResponseEntity.badRequest().body(Map.of("message", "Course name is required."));
+        Course course = courseService.createCourse(request.getCourseName().trim());
+        if (course == null) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "A course with this name already exists."));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CourseResponse.from(course));
     }
 
     @PutMapping("/{courseId}")
-    public ResponseEntity<?> renameCourse(@PathVariable Long courseId, @org.jetbrains.annotations.NotNull @RequestBody NewCourseRequest newCourseDetails) {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        Course toRename = courseService.renameCourse(courseId, newCourseDetails.getCourseName());
-
-        if (toRename == null)
-            return new ResponseEntity<>("Course does not Exist.", HttpStatus.NOT_FOUND);
-        else
-            return new ResponseEntity<>("Course renamed to '" + toRename.getCourseName() + "'", HttpStatus.OK);
+    public ResponseEntity<?> renameCourse(@PathVariable Long courseId, @RequestBody NewCourseRequest request) {
+        if (isBlank(request.getCourseName())) return ResponseEntity.badRequest().body(Map.of("message", "Course name is required."));
+        Course course = courseService.renameCourse(courseId, request.getCourseName().trim());
+        if (course == null) return notFound("Course not found or the name is already in use.");
+        return ResponseEntity.ok(CourseResponse.from(course));
     }
+
+    @DeleteMapping("/{courseId}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long courseId) {
+        return courseService.deleteCourse(courseId) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{courseId}/progress")
+    public ResponseEntity<?> getProgress(@PathVariable Long courseId) {
+        Course course = courseService.getCourseByID(courseId);
+        if (course == null) return notFound("Course not found.");
+        return ResponseEntity.ok(skillProgressService.getCourseProgress(course.getCourseName()));
+    }
+
+    private ResponseEntity<Map<String, String>> notFound(String message) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", message));
+    }
+
+    private boolean isBlank(String value) { return value == null || value.trim().isEmpty(); }
 }

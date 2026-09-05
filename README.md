@@ -5,6 +5,8 @@
 A productivity tracker for students inspired by Google Tasks & Duolingo, with course and task management, gamified with XP and levels.
 Built with Spring Boot in Java.
 
+The current frontend-ready REST contract is documented in [API.md](API.md). All current routes are versioned under `/api` (for example, `/api/auth/login` and `/api/courses`).
+
 Users can:
 - Register & Log in (via `/auth`)
 - Receive stateless JWT tokens upon successful login

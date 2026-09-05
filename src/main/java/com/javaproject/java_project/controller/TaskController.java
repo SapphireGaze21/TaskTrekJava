@@ -1,118 +1,72 @@
 package com.javaproject.java_project.controller;
 
+import com.javaproject.java_project.dto.TaskResponse;
+import com.javaproject.java_project.model.Course;
 import com.javaproject.java_project.model.Task;
-import com.javaproject.java_project.model.User;
 import com.javaproject.java_project.request.EditedTaskRequest;
 import com.javaproject.java_project.request.NewTaskRequest;
-import com.javaproject.java_project.service.AuthService;
+import com.javaproject.java_project.service.CourseService;
+import com.javaproject.java_project.service.SkillProgressService;
 import com.javaproject.java_project.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
-@RequestMapping("/courses/{courseID}/tasks")
-public class TaskController 
-{
-    private final AuthService authService;
+@RequestMapping("/api/courses/{courseId}/tasks")
+public class TaskController {
     private final TaskService taskService;
+    private final CourseService courseService;
+    private final SkillProgressService skillProgressService;
 
-    // don't really have the notion of a "Current Course"
-
-    public TaskController(AuthService authService, TaskService taskService) {
-        this.authService = authService;
+    public TaskController(TaskService taskService, CourseService courseService, SkillProgressService skillProgressService) {
         this.taskService = taskService;
+        this.courseService = courseService;
+        this.skillProgressService = skillProgressService;
     }
-
-    /*
-    @GetMapping
-    public ResponseEntity<?> getTasks(@PathVariable int courseId)
-    {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        List<Task> tasks = taskService.getTasksForCourse(courseId);
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
-    }
-    */
 
     @PostMapping
-    public ResponseEntity<?> createTask(@PathVariable Long courseID, @RequestBody NewTaskRequest newTaskDetails)
-    {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        // trim will take care of strings with just spaces (they are empty)
-        if (newTaskDetails.getTitle() == null || newTaskDetails.getTitle().trim().isEmpty())
-            return new ResponseEntity<>("Task Name cannot be empty", HttpStatus.BAD_REQUEST);
-
-        Task created = taskService.createTask(
-                courseID,
-                newTaskDetails.getTaskType(),
-                newTaskDetails.getTitle(),
-                newTaskDetails.getDescription(),
-                newTaskDetails.getDeadline()
-        );
-
-        if (created == null)
-            return new ResponseEntity<>("Task could not be created", HttpStatus.BAD_REQUEST);
-
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<?> createTask(@PathVariable Long courseId, @RequestBody NewTaskRequest request) {
+        if (isBlank(request.getTitle())) return ResponseEntity.badRequest().body(Map.of("message", "Task title is required."));
+        Task task = taskService.createTask(courseId, request.getTaskType(), request.getTitle().trim(), request.getDescription(), request.getDeadline());
+        if (task == null) return notFound("Course not found.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(TaskResponse.from(task));
     }
 
-    // editing only what's been changed - PATCH
     @PatchMapping("/{taskId}")
-    public ResponseEntity<?> editTask(@PathVariable Long courseID, @PathVariable Long taskId, @RequestBody EditedTaskRequest editedTaskDetails)
-    {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        if (editedTaskDetails.getName() == null && editedTaskDetails.getDescription() == null && editedTaskDetails.getDeadline() == null)
-            return new ResponseEntity<>("No fields to update", HttpStatus.BAD_REQUEST);
-
-        Task updated = taskService.editTask(
-                courseID,
-                taskId,
-                editedTaskDetails.getName(),
-                editedTaskDetails.getDescription(),
-                editedTaskDetails.getDeadline()
-        );
-
-
-        if (updated == null)
-            return new ResponseEntity<>("Task could not be updated", HttpStatus.BAD_REQUEST);
-
-        return new ResponseEntity<>(updated, HttpStatus.CREATED);
+    public ResponseEntity<?> editTask(@PathVariable Long courseId, @PathVariable Long taskId, @RequestBody EditedTaskRequest request) {
+        if (request.getTitle() == null && request.getDescription() == null && request.getDeadline() == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Provide title, description, or deadline."));
+        }
+        if (request.getTitle() != null && request.getTitle().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Task title cannot be blank."));
+        }
+        Task task = taskService.editTask(courseId, taskId, request.getTitle(), request.getDescription(), request.getDeadline());
+        if (task == null) return notFound("Task not found.");
+        return ResponseEntity.ok(TaskResponse.from(task));
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long courseID, @PathVariable Long taskId)
-    {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        boolean deleted = taskService.deleteTask(courseID, taskId);
-        if (!deleted)
-            return new ResponseEntity<>("Task not found", HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity<>("Task deleted", HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> deleteTask(@PathVariable Long courseId, @PathVariable Long taskId) {
+        return taskService.deleteTask(courseId, taskId) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @PostMapping("/{taskId}/complete")
-    public ResponseEntity<?> completeTask(@PathVariable Long courseID, @PathVariable Long taskId)
-    {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser == null)
-            return new ResponseEntity<>("Log-In First", HttpStatus.UNAUTHORIZED);
-
-        boolean completed = taskService.completeTask(courseID, taskId);
-        if (!completed)
-            return new ResponseEntity<>("Task not found or already completed", HttpStatus.BAD_REQUEST);
-
-        return new ResponseEntity<>("Task completed", HttpStatus.OK);
+    public ResponseEntity<?> completeTask(@PathVariable Long courseId, @PathVariable Long taskId) {
+        if (!taskService.completeTask(courseId, taskId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Task was not found or is already completed."));
+        }
+        Course course = courseService.getCourseByID(courseId);
+        Task task = taskService.getTaskByID(courseId, taskId);
+        return ResponseEntity.ok(Map.of("task", TaskResponse.from(task),
+                "progress", skillProgressService.getCourseProgress(course.getCourseName())));
     }
+
+    private ResponseEntity<Map<String, String>> notFound(String message) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", message));
+    }
+
+    private boolean isBlank(String value) { return value == null || value.trim().isEmpty(); }
 }

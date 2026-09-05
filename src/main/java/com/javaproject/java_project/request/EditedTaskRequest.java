@@ -1,6 +1,7 @@
 package com.javaproject.java_project.request;
 
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +11,8 @@ import java.time.LocalDateTime;
 @Setter
 public class EditedTaskRequest
 {
-    private String name;
+    @JsonAlias("name")
+    private String title;
     private String description;
     private LocalDateTime deadline;
 
